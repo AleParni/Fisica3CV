@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio de Mediciones Eléctricas — Liceo Dr. Juan Belza</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0d0f14;
+    --surface:  #161b25;
+    --panel:    #1e2535;
+    --border:   #2a3450;
+    --amber:    #f5a623;
+    --amber2:   #e8890a;
+    --cyan:     #3ecfcf;
+    --cyan2:    #27aaa8;
+    --red:      #e05252;
+    --green:    #3ec97a;
+    --text:     #d4dce8;
+    --muted:    #637089;
+    --mono:     'Share Tech Mono', monospace;
+    --head:     'Barlow Condensed', sans-serif;
+    --body:     'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── BACKGROUND GRID ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(62,207,207,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(62,207,207,.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative; z-index: 10;
+    background: linear-gradient(135deg, #0d1520 0%, #111827 60%, #0a1a2e 100%);
+    border-bottom: 2px solid var(--amber);
+    padding: 18px 32px;
+    display: flex; align-items: center; gap: 18px;
+  }
+  .logo-bolt {
+    width: 44px; height: 44px;
+    background: var(--amber);
+    clip-path: polygon(50% 0%,65% 40%,100% 40%,55% 100%,45% 58%,0% 58%,35% 0%);
+    flex-shrink: 0;
+  }
+  .header-text h1 {
+    font-family: var(--head);
+    font-size: 26px; font-weight: 900;
+    letter-spacing: 1px;
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .header-text p {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--amber);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .header-badge {
+    margin-left: auto;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: 1px;
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  /* ── NAV TABS ── */
+  nav {
+    position: relative; z-index: 10;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; padding: 0 24px; gap: 0;
+  }
+  .tab-btn {
+    font-family: var(--head);
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none; border: none;
+    padding: 14px 20px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all .2s;
+    position: relative;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--amber);
+    border-bottom-color: var(--amber);
+  }
+  .tab-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px;
+    background: var(--panel);
+    border-radius: 50%;
+    font-size: 10px;
+    margin-right: 6px;
+    color: var(--muted);
+  }
+  .tab-btn.active .tab-num { background: var(--amber); color: #000; }
+
+  /* ── MAIN ── */
+  main {
+    position: relative; z-index: 5;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+
+  /* ── SECTIONS ── */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── SECTION TITLE ── */
+  .sec-title {
+    font-family: var(--head);
+    font-size: 32px; font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .sec-title span { color: var(--amber); }
+  .sec-sub {
+    font-size: 14px; color: var(--muted);
+    margin-bottom: 28px;
+    font-family: var(--mono);
+    letter-spacing: .5px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-family: var(--head);
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::before {
+    content: '';
+    display: inline-block;
+    width: 4px; height: 16px;
+    background: var(--cyan);
+    border-radius: 2px;
+  }
+
+  /* ── TEORIA ── */
+  .magnitudes-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 12px;
+  }
+  .magnitudes-table th {
+    background: var(--panel);
+    color: var(--amber);
+    font-family: var(--head);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 11px;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--amber);
+  }
+  .magnitudes-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .magnitudes-table tr:hover td { background: rgba(255,255,255,.02); }
+  .magnitudes-table .highlight-row td:first-child {
+    color: var(--cyan);
+    font-weight: 600;
+  }
+  .unit-badge {
+    display: inline-block;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--amber);
+  }
+  .instrumento-tag {
+    display: inline-block;
+    background: rgba(62,207,207,.1);
+    border: 1px solid rgba(62,207,207,.3);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: var(--cyan);
+  }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+  .info-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .info-box h4 {
+    font-family: var(--head);
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 10px;
+  }
+  .cc-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 56px; height: 34px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 12px;
+    border: 2px solid rgba(255,255,255,.2);
+    font-weight: bold;
+    margin: 3px;
+  }
+  .cc-badge.cc { background: rgba(255,255,255,.1); color: var(--text); }
+  .cc-badge.ac { background: rgba(245,166,35,.15); border-color: var(--amber); color: var(--amber); }
+
+  /* ── MULTIPLIER TABLE ── */
+  .multi-table { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .multi-row {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--panel); border-radius: 4px; padding: 5px 8px;
+    font-size: 12px;
+  }
+  .multi-row .sym { font-family: var(--mono); color: var(--amber); width: 24px; text-align: center; }
+  .multi-row .val { font-family: var(--mono); font-size: 11px; color: var(--cyan); }
+
+  /* ── RESISTOR VISUAL ── */
+  .resistor-wrap {
+    display: flex; justify-content: center; align-items: center;
+    padding: 20px 0;
+  }
+  .resistor-svg { max-width: 560px; width: 100%; }
+
+  /* ── COLOR SELECTOR ── */
+  .band-selectors {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .band-group {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .band-label {
+    font-family: var(--mono);
+    font-size: 10px; letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .band-select {
+    appearance: none;
+    background: var(--panel);
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 6px 10px;
+    width: 130px;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .band-select:focus { outline: none; border-color: var(--cyan); }
+
+  /* ── RESULT DISPLAY ── */
+  .result-display {
+    background: #040608;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 28px;
+    text-align: center;
+    margin-top: 20px;
+    font-family: var(--mono);
+  }
+  .result-display .big-val {
+    font-size: 42px;
+    color: var(--amber);
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+  .result-display .sub-val {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+  .tolerance-row {
+    display: flex; justify-content: center; gap: 24px; margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .tol-item { font-size: 12px; color: var(--muted); }
+  .tol-item span { color: var(--cyan); font-family: var(--mono); }
+
+  /* ── MULTIMETER ── */
+  .meter-layout {
+    display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px;
+    align-items: start;
+  }
+  .meter-body {
+    background: #1a1f2e;
+    border: 3px solid #2d3550;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.05);
+    position: relative;
+    user-select: none;
+  }
+  .meter-brand {
+    font-family: var(--head);
+    font-size: 18px; font-weight: 900;
+    letter-spacing: 3px;
+    color: #fff;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .meter-model {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .meter-screen {
+    background: #0a1a0f;
+    border: 2px solid #1a3020;
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: var(--mono);
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .meter-screen::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,.04) 0%, transparent 40%);
+    pointer-events: none;
+  }
+  .screen-mode {
+    font-size: 10px; letter-spacing: 2px;
+    color: #2a7a40;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .screen-value {
+    font-size: 44px;
+    color: #3ef080;
+    line-height: 1;
+    letter-spacing: 3px;
+    text-shadow: 0 0 12px rgba(62,240,128,.4);
+    transition: all .3s;
+  }
+  .screen-unit {
+    font-size: 14px;
+    color: #27a050;
+    letter-spacing: 2px;
+    margin-top: 4px;
+  }
+
+  /* ── KNOB ── */
+  .knob-area {
+    display: flex; justify-content: center; margin: 12px 0;
+  }
+  .knob-ring {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 3px solid #3a4060;
+    background: conic-gradient(
+      #e05252 0deg 40deg,
+      #2a3450 40deg 72deg,
+      #f5a623 72deg 108deg,
+      #2a3450 108deg 144deg,
+      #3ecfcf 144deg 180deg,
+      #2a3450 180deg 216deg,
+      #3ef080 216deg 252deg,
+      #2a3450 252deg 288deg,
+      #f5a623 288deg 324deg,
+      #2a3450 324deg 360deg
+    );
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: transform .3s;
+    box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  }
+  .knob-center {
+    width: 72px; height: 72px;
+    background: radial-gradient(circle at 38% 36%, #2e3550, #1a2030);
+    border-radius: 50%;
+    border: 2px solid #3a4060;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--amber);
+    letter-spacing: 1px;
+  }
+
+  .meter-ports {
+    display: flex; justify-content: center; gap: 12px; margin-top: 14px;
+  }
+  .port {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .port-hole {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 3px solid;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 8px;
+  }
+  .port-hole.com { border-color: #555; background: #111; color: #555; }
+  .port-hole.vma { border-color: var(--amber); background: rgba(245,166,35,.1); color: var(--amber); }
+  .port-hole.ten-a { border-color: var(--red); background: rgba(224,82,82,.1); color: var(--red); }
+  .port-label { font-size: 9px; color: var(--muted); letter-spacing: .5px; font-family: var(--mono); }
+
+  /* ── RESISTANCE TESTER CONTROLS ── */
+  .test-panel { }
+  .test-panel h3 {
+    font-family: var(--head);
+    font-size: 20px; font-weight: 800;
+    letter-spacing: 1px;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .test-panel p.desc { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+
+  .resistor-slots {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .resistor-slot {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 14px;
+    transition: border-color .2s;
+    cursor: pointer;
+  }
+  .resistor-slot:hover { border-color: var(--cyan); }
+  .resistor-slot.selected { border-color: var(--amber); background: rgba(245,166,35,.06); }
+  .slot-num {
+    width: 32px; height: 32px;
+    background: var(--bg);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--head);
+    font-size: 14px; font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .resistor-slot.selected .slot-num { background: var(--amber); color: #000; }
+  .slot-bands {
+    display: flex; gap: 4px; align-items: center; flex: 1;
+  }
+  .slot-band {
+    width: 18px; height: 36px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,.15);
+    flex-shrink: 0;
+  }
+  .slot-info {
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .slot-info .slot-val { font-size: 15px; color: var(--text); }
+  .measure-btn {
+    background: var(--amber);
+    color: #000;
+    font-family: var(--head);
+    font-size: 13px; font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+    white-space: nowrap;
+  }
+  .measure-btn:hover { background: var(--amber2); }
+  .measure-btn:active { transform: scale(.96); }
+
+  /* ── PRACTICE SECTION ── */
+  .practice-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;
+  }
+  .practice-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .practice-header {
+    background: var(--panel);
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .practice-num {
+    width: 28px; height: 28px;
+    background: var(--amber);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--head);
+    font-size: 14px; font-weight: 800;
+    color: #000;
+    flex-shrink: 0;
+  }
+  .practice-header h3 {
+    font-family: var(--head);
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .practice-body { padding: 16px; }
+
+  .mini-resistor { display: flex; justify-content: center; margin: 12px 0; }
+
+  .input-group { margin-bottom: 12px; }
+  .input-group label {
+    font-family: var(--mono);
+    font-size: 10px; letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: block; margin-bottom: 4px;
+  }
+  .input-group select, .input-group input {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 7px 10px;
+    cursor: pointer;
+  }
+  .input-group select:focus, .input-group input:focus {
+    outline: none; border-color: var(--cyan);
+  }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--amber);
+    color: #000;
+    font-family: var(--head);
+    font-size: 13px; font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .15s;
+    margin-top: 4px;
+  }
+  .btn-primary:hover { background: var(--amber2); }
+  .btn-primary.secondary {
+    background: transparent;
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    margin-top: 8px;
+  }
+  .btn-primary.secondary:hover { background: rgba(62,207,207,.1); }
+
+  .result-box {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    display: none;
+  }
+  .result-box.show { display: block; }
+  .result-box .r-line {
+    display: flex; justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-box .r-line:last-child { border-bottom: none; }
+  .result-box .r-line .label { color: var(--muted); }
+  .result-box .r-line .value { color: var(--text); }
+  .result-box .r-line .value.good { color: var(--green); }
+  .result-box .r-line .value.bad { color: var(--red); }
+  .result-box .r-line .value.warn { color: var(--amber); }
+
+  .status-badge {
+    display: block; width: 100%;
+    text-align: center;
+    padding: 8px;
+    border-radius: 5px;
+    font-family: var(--head);
+    font-size: 13px; font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+  .status-badge.good { background: rgba(62,201,122,.15); color: var(--green); border: 1px solid var(--green); }
+  .status-badge.bad { background: rgba(224,82,82,.15); color: var(--red); border: 1px solid var(--red); }
+  .status-badge.warn { background: rgba(245,166,35,.15); color: var(--amber); border: 1px solid var(--amber); }
+
+  /* ── BAND COLOR REFS ── */
+  .color-bands-ref {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .cbr-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px;
+    background: var(--panel);
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .cbr-dot {
+    width: 18px; height: 18px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,.2);
+    flex-shrink: 0;
+  }
+  .cbr-name { color: var(--text); flex: 1; }
+  .cbr-val { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 5;
+    text-align: center;
+    padding: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── TOOLTIP ── */
+  .tooltip {
+    position: relative; display: inline-block;
+    cursor: help;
+    border-bottom: 1px dashed var(--muted);
+  }
+  .tooltip .tip-text {
+    visibility: hidden; opacity: 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    width: 220px;
+    position: absolute;
+    z-index: 100;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: opacity .2s;
+    pointer-events: none;
+    line-height: 1.5;
+    font-family: var(--body);
+  }
+  .tooltip:hover .tip-text { visibility: visible; opacity: 1; }
+
+  /* ── ALERT ── */
+  .alert {
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: flex; gap: 10px;
+  }
+  .alert-warn { background: rgba(245,166,35,.1); border: 1px solid rgba(245,166,35,.3); color: #deb97a; }
+  .alert-info { background: rgba(62,207,207,.1); border: 1px solid rgba(62,207,207,.3); color: #7ddede; }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .meter-layout { grid-template-columns: 1fr; }
+    .practice-grid { grid-template-columns: 1fr; }
+    .info-grid { grid-template-columns: 1fr; }
+    .color-bands-ref { grid-template-columns: repeat(2, 1fr); }
+    .tab-btn { padding: 12px 10px; font-size: 11px; letter-spacing: .5px; }
+  }
+
+  /* ── ANIM ── */
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .blink { animation: blink 1.5s ease infinite; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .section.active { animation: fadeIn .25s ease; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-bolt"></div>
+  <div class="header-text">
+    <h1>Laboratorio de Mediciones Eléctricas</h1>
+    <p>Instrumentos de Medición · Liceo Dr. Juan Belza</p>
+  </div>
+  <div class="header-badge">
+    LABORATORIO DE FÍSICA<br>MÓDULO INTERACTIVO
+  </div>
+</header>
+
+<nav>
+  <button class="tab-btn active" onclick="showTab(0)"><span class="tab-num">1</span>Magnitudes</button>
+  <button class="tab-btn" onclick="showTab(1)"><span class="tab-num">2</span>Código de Colores</button>
+  <button class="tab-btn" onclick="showTab(2)"><span class="tab-num">3</span>Multímetro Virtual</button>
+  <button class="tab-btn" onclick="showTab(3)"><span class="tab-num">4</span>Práctica Comparativa</button>
+</nav>
+
+<main>
+
+  <!-- ══════════════ TAB 1: MAGNITUDES ══════════════ -->
+  <section class="section active" id="tab0">
+    <p class="sec-title">Magnitudes <span>Eléctricas</span></p>
+    <p class="sec-sub">// Referencia de magnitudes, unidades e instrumentos de medición</p>
+
+    <div class="card">
+      <div class="card-title">Tabla de Magnitudes</div>
+      <table class="magnitudes-table">
+        <thead>
+          <tr>
+            <th>Magnitud</th>
+            <th>Símbolo</th>
+            <th>Unidad</th>
+            <th>Instrumento</th>
+            <th>Método</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>Resistencia</td><td>R</td>
+            <td><span class="unit-badge">Ω</span></td>
+            <td><span class="instrumento-tag">Óhmetro / Multímetro</span></td>
+            <td>Directo</td>
+          </tr>
+          <tr><td>Tensión / Voltaje</td><td>V o U</td>
+            <td><span class="unit-badge">V</span></td>
+            <td><span class="instrumento-tag">Voltímetro</span></td>
+            <td>Paralelo</td>
+          </tr>
+          <tr><td>Intensidad de Corriente</td><td>I</td>
+            <td><span class="unit-badge">A</span></td>
+            <td><span class="instrumento-tag">Amperímetro / Pinza</span></td>
+            <td>Serie</td>
+          </tr>
+          <tr><td>Capacidad</td><td>C</td>
+            <td><span class="unit-badge">F</span></td>
+            <td><span class="instrumento-tag">Multímetro</span></td>
+            <td>Directo</td>
+          </tr>
+          <tr><td>Inductancia</td><td>L</td>
+            <td><span class="unit-badge">H</span></td>
+            <td><span class="instrumento-tag">Multímetro</span></td>
+            <td>Directo</td>
+          </tr>
+          <tr><td>Potencia Activa</td><td>P</td>
+            <td><span class="unit-badge">W</span></td>
+            <td><span class="instrumento-tag">Vatímetro</span></td>
+            <td>Directo</td>
+          </tr>
+          <tr><td>Potencia Reactiva</td><td>Q</td>
+            <td><span class="unit-badge">VAr</span></td>
+            <td><span class="instrumento-tag">Multimedidor</span></td>
+            <td>Indirecto</td>
+          </tr>
+          <tr><td>Potencia Aparente</td><td>S</td>
+            <td><span class="unit-badge">VA</span></td>
+            <td><span class="instrumento-tag">Multimedidor</span></td>
+            <td>Indirecto</td>
+          </tr>
+          <tr><td>Frecuencia</td><td>f</td>
+            <td><span class="unit-badge">Hz</span></td>
+            <td><span class="instrumento-tag">Frecuencímetro</span></td>
+            <td>Directo</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-box">
+        <h4>Tipo de Corriente</h4>
+        <div style="display:flex;gap:12px;margin-top:4px;">
+          <div class="cc-badge cc">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <span style="font-size:16px;letter-spacing:2px">— —</span>
+              <span style="font-size:9px;color:var(--muted)">CC / DC</span>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--muted)">
+            <strong style="color:var(--text)">Corriente Continua (CC / DC)</strong><br>
+            Fluye en una sola dirección. Ej: baterías, pilas.
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:12px;">
+          <div class="cc-badge ac">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <span style="font-size:20px;">∿</span>
+              <span style="font-size:9px;">CA / AC</span>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--muted)">
+            <strong style="color:var(--text)">Corriente Alterna (CA / AC)</strong><br>
+            Invierte su dirección periódicamente. Ej: red eléctrica domiciliaria.
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <h4>Múltiplos Comunes</h4>
+        <div class="multi-table">
+          <div class="multi-row"><span class="sym">M</span><span>Mega</span><span class="val">×10⁶</span></div>
+          <div class="multi-row"><span class="sym">k</span><span>Kilo</span><span class="val">×10³</span></div>
+          <div class="multi-row"><span class="sym">—</span><span>Base</span><span class="val">×10⁰</span></div>
+          <div class="multi-row"><span class="sym">m</span><span>Mili</span><span class="val">×10⁻³</span></div>
+          <div class="multi-row"><span class="sym">μ</span><span>Micro</span><span class="val">×10⁻⁶</span></div>
+          <div class="multi-row"><span class="sym">n</span><span>Nano</span><span class="val">×10⁻⁹</span></div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted)">
+          Ej: <span style="color:var(--amber);font-family:var(--mono)">4.7kΩ = 4 700 Ω</span> &nbsp;|&nbsp; 
+          <span style="color:var(--amber);font-family:var(--mono)">220μF = 0.00022 F</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Conexión del Instrumento según Magnitud</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--cyan);margin-bottom:8px;">Amperímetro — conexión en SERIE</div>
+          <svg viewBox="0 0 300 100" style="width:100%;background:var(--panel);border-radius:6px;padding:8px;">
+            <line x1="10" y1="50" x2="80" y2="50" stroke="#3ecfcf" stroke-width="2"/>
+            <rect x="80" y="35" width="60" height="30" rx="4" fill="#1e2535" stroke="#3ecfcf" stroke-width="1.5"/>
+            <text x="110" y="54" font-family="monospace" font-size="14" fill="#3ecfcf" text-anchor="middle">A</text>
+            <line x1="140" y1="50" x2="200" y2="50" stroke="#3ecfcf" stroke-width="2"/>
+            <rect x="200" y="30" width="50" height="40" rx="4" fill="#1e2535" stroke="#637089" stroke-width="1.5"/>
+            <text x="225" y="54" font-family="monospace" font-size="10" fill="#637089" text-anchor="middle">CARGA</text>
+            <line x1="250" y1="50" x2="290" y2="50" stroke="#3ecfcf" stroke-width="2"/>
+            <text x="150" y="90" font-family="monospace" font-size="9" fill="#637089" text-anchor="middle">◄── mismo conductor ──►</text>
+          </svg>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--amber);margin-bottom:8px;">Voltímetro — conexión en PARALELO</div>
+          <svg viewBox="0 0 300 100" style="width:100%;background:var(--panel);border-radius:6px;padding:8px;">
+            <line x1="10" y1="50" x2="290" y2="50" stroke="#f5a623" stroke-width="2"/>
+            <rect x="150" y="30" width="50" height="40" rx="4" fill="#1e2535" stroke="#637089" stroke-width="1.5"/>
+            <text x="175" y="54" font-family="monospace" font-size="10" fill="#637089" text-anchor="middle">CARGA</text>
+            <line x1="175" y1="30" x2="175" y2="8" stroke="#f5a623" stroke-width="1.5"/>
+            <line x1="85" y1="8" x2="175" y2="8" stroke="#f5a623" stroke-width="1.5"/>
+            <line x1="85" y1="8" x2="85" y2="50" stroke="#f5a623" stroke-width="1.5"/>
+            <rect x="55" y="30" width="60" height="30" rx="4" fill="#1e2535" stroke="#f5a623" stroke-width="1.5"/>
+            <text x="85" y="49" font-family="monospace" font-size="14" fill="#f5a623" text-anchor="middle">V</text>
+            <text x="150" y="90" font-family="monospace" font-size="9" fill="#637089" text-anchor="middle">puntas sobre bornes de la carga</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════ TAB 2: CÓDIGO DE COLORES ══════════════ -->
+  <section class="section" id="tab1">
+    <p class="sec-title">Código de <span>Colores</span></p>
+    <p class="sec-sub">// Calculadora interactiva para resistores de 4 y 5 bandas</p>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">ℹ</span>
+      <span>Seleccioná las bandas de color del resistor para calcular su valor nominal y su rango de tolerancia. Luego pasá al <strong>Multímetro Virtual</strong> para comparar con la medición directa.</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Configuración del Resistor</div>
+
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Número de bandas:</span>
+        <button id="btn4" class="measure-btn" onclick="setBands(4)">4 Bandas</button>
+        <button id="btn5" class="measure-btn" onclick="setBands(5)" style="background:var(--panel);border:1px solid var(--border);color:var(--text);">5 Bandas</button>
+      </div>
+
+      <!-- RESISTOR SVG -->
+      <div class="resistor-wrap">
+        <svg id="res-svg" class="resistor-svg" viewBox="0 0 560 120" xmlns="http://www.w3.org/2000/svg">
+          <!-- Leads -->
+          <line x1="10" y1="60" x2="100" y2="60" stroke="#888" stroke-width="3"/>
+          <line x1="460" y1="60" x2="550" y2="60" stroke="#888" stroke-width="3"/>
+          <!-- Body -->
+          <rect x="100" y="30" width="360" height="60" rx="14" fill="#c8a96e" stroke="#a0814a" stroke-width="2"/>
+          <!-- Bands — will be colored by JS -->
+          <rect id="band1" x="140" y="28" width="32" height="64" rx="3"/>
+          <rect id="band2" x="192" y="28" width="32" height="64" rx="3"/>
+          <rect id="band3" x="244" y="28" width="32" height="64" rx="3"/>
+          <rect id="band4" x="296" y="28" width="32" height="64" rx="3"/>
+          <rect id="band5" x="348" y="28" width="32" height="64" rx="3"/>
+          <!-- Tolerance gap visual hint -->
+          <line id="tol-divider" x1="332" y1="22" x2="332" y2="98" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-dasharray="4 3"/>
+          <!-- End mark -->
+          <line x1="440" y1="35" x2="440" y2="85" stroke="rgba(0,0,0,.15)" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <!-- SELECTORS -->
+      <div class="band-selectors" id="band-selectors">
+        <!-- generated by JS -->
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="result-display" id="color-result">
+      <div class="big-val" id="res-value">— — —</div>
+      <div class="sub-val" id="res-unit">Seleccioná los colores arriba</div>
+      <div class="tolerance-row" id="tol-row" style="display:none;">
+        <div class="tol-item">Tolerancia: <span id="tol-pct">—</span></div>
+        <div class="tol-item">Mín: <span id="tol-min">—</span></div>
+        <div class="tol-item">Máx: <span id="tol-max">—</span></div>
+      </div>
+    </div>
+
+    <!-- COLOR REFERENCE -->
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">Referencia de Colores</div>
+      <div class="color-bands-ref" id="color-ref-table">
+        <!-- generated by JS -->
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════ TAB 3: MULTÍMETRO VIRTUAL ══════════════ -->
+  <section class="section" id="tab2">
+    <p class="sec-title">Multímetro <span>Virtual</span></p>
+    <p class="sec-sub">// Demestres 3801 — Medición directa de resistencia (óhmetro)</p>
+
+    <div class="alert alert-warn">
+      <span class="alert-icon">⚡</span>
+      <span><strong>¡IMPORTANTE!</strong> Antes de medir resistencia, asegurate de que el componente esté <strong>desconectado del circuito</strong> y sin tensión. El Demestres 3801 posee protección interna mediante fusibles.</span>
+    </div>
+
+    <div class="meter-layout">
+      <!-- LEFT: Meter visual -->
+      <div class="meter-body">
+        <div class="meter-brand">DEMESTRES</div>
+        <div class="meter-model">MODEL 3801 · DIGITAL MULTIMETER</div>
+
+        <div class="meter-screen">
+          <div class="screen-mode" id="m-mode">OHMS · Ω</div>
+          <div class="screen-value" id="m-display">0.L</div>
+          <div class="screen-unit" id="m-unit">kΩ</div>
+        </div>
+
+        <div class="knob-area">
+          <div class="knob-ring" id="knob" title="Selector de función">
+            <div class="knob-center" id="knob-label">Ω</div>
+          </div>
+        </div>
+        <div style="text-align:center;font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:8px;letter-spacing:1px;">
+          ← girar para cambiar función
+        </div>
+
+        <div class="meter-ports">
+          <div class="port">
+            <div class="port-hole ten-a">10A</div>
+            <div class="port-label">10A MAX</div>
+          </div>
+          <div class="port">
+            <div class="port-hole com">COM</div>
+            <div class="port-label">COMÚN</div>
+          </div>
+          <div class="port">
+            <div class="port-hole vma">VΩ</div>
+            <div class="port-label">V·Ω·mA</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Test panel -->
+      <div class="test-panel">
+        <h3>Seleccioná un Resistor a Medir</h3>
+        <p class="desc">Hacé click en un resistor y luego presioná "MEDIR" para obtener la lectura en el instrumento.</p>
+
+        <div class="resistor-slots" id="meter-slots">
+          <!-- generated by JS -->
+        </div>
+
+        <div style="margin-top:20px;" id="meter-result-area" style="display:none;">
+          <div class="card" style="margin:0;padding:16px;">
+            <div class="card-title" style="font-size:12px;margin-bottom:10px;">Resultado de Medición</div>
+            <div id="meter-result-detail" style="font-family:var(--mono);font-size:13px;color:var(--muted);">
+              Seleccioná y medí un resistor.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════ TAB 4: PRÁCTICA ══════════════ -->
+  <section class="section" id="tab3">
+    <p class="sec-title">Práctica <span>Comparativa</span></p>
+    <p class="sec-sub">// Lee el código de colores → midí con el multímetro → determiná el estado del resistor</p>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📋</span>
+      <span>Para cada resistor: <strong>1)</strong> Identificá el valor por código de colores. <strong>2)</strong> Hacé la medición directa con el multímetro. <strong>3)</strong> Compará los valores y determiná si el resistor está en buen estado (dentro de la tolerancia declarada).</span>
+    </div>
+
+    <div class="practice-grid" id="practice-grid">
+      <!-- generated by JS -->
+    </div>
+
+    <div class="card" style="margin-top:20px;" id="summary-card" style="display:none;">
+      <div class="card-title">Resumen del Práctico</div>
+      <div id="summary-content"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:24px;">
+      <button class="btn-primary" style="width:auto;padding:12px 32px;" onclick="regeneratePractice()">⟳ Generar nuevos resistores</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Liceo Dr. Juan Belza · Laboratorio de Física · Módulo: Instrumentos de Medición Eléctrica
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════════════════
+const COLORS = [
+  { name:'Negro',   hex:'#1a1a1a', digit:0, mult:1,       tol:null,   tcr:100 },
+  { name:'Marrón',  hex:'#7b3f00', digit:1, mult:10,       tol:1,      tcr:100 },
+  { name:'Rojo',    hex:'#c0392b', digit:2, mult:100,      tol:2,      tcr:50  },
+  { name:'Naranja', hex:'#e67e22', digit:3, mult:1000,     tol:null,   tcr:15  },
+  { name:'Amarillo',hex:'#f1c40f', digit:4, mult:10000,    tol:null,   tcr:25  },
+  { name:'Verde',   hex:'#27ae60', digit:5, mult:100000,   tol:0.5,    tcr:20  },
+  { name:'Azul',    hex:'#2980b9', digit:6, mult:1000000,  tol:0.25,   tcr:10  },
+  { name:'Violeta', hex:'#8e44ad', digit:7, mult:10000000, tol:0.1,    tcr:5   },
+  { name:'Gris',    hex:'#7f8c8d', digit:8, mult:null,     tol:0.05,   tcr:null},
+  { name:'Blanco',  hex:'#ecf0f1', digit:9, mult:null,     tol:null,   tcr:null},
+  { name:'Oro',     hex:'#d4a017', digit:null, mult:0.1,   tol:5,      tcr:null},
+  { name:'Plata',   hex:'#95a5a6', digit:null, mult:0.01,  tol:10,     tcr:null},
+];
+
+function colorByName(name){ return COLORS.find(c=>c.name===name); }
+
+// Preset resistors for the multimeter tab and practice
+let RESISTORS = [];
+function generateResistors(){
+  const presets = [
+    { bands4:['Amarillo','Violeta','Rojo','Oro'],    bands5:['Amarillo','Violeta','Negro','Rojo','Marrón'] },
+    { bands4:['Marrón','Negro','Naranja','Dorado'],  bands5:['Marrón','Negro','Negro','Rojo','Marrón']    },
+    { bands4:['Rojo','Rojo','Naranja','Plata'],      bands5:['Rojo','Rojo','Negro','Naranja','Marrón']    },
+    { bands4:['Verde','Azul','Amarillo','Oro'],      bands5:['Verde','Azul','Negro','Amarillo','Marrón']  },
+    { bands4:['Naranja','Naranja','Rojo','Dorado'],  bands5:['Naranja','Naranja','Negro','Marrón','Marrón']},
+  ];
+  // pick 3 random unique
+  const shuffled = [...presets].sort(()=>Math.random()-.5).slice(0,3);
+  RESISTORS = shuffled.map((p,i)=>{
+    const b4 = p.bands4.map(n=>{ 
+      // fix "Dorado" typo to "Oro"
+      if(n==='Dorado') return colorByName('Oro');
+      return colorByName(n);
+    }).filter(Boolean);
+    const val = calcResistor4(b4);
+    // simulate a measurement: random deviation within or outside tolerance
+    const tol = b4[3] ? b4[3].tol||5 : 5;
+    const isGood = Math.random() > 0.3; // 70% chance good
+    let factor;
+    if(isGood){
+      // within tolerance
+      const dev = (Math.random()*2-1) * (tol/100) * 0.8;
+      factor = 1 + dev;
+    } else {
+      // outside tolerance (bad resistor)
+      const overdrive = tol/100 * (1.5 + Math.random()*2);
+      factor = Math.random() > 0.5 ? 1+overdrive : 1-overdrive;
+      // ensure not going to zero
+      if(factor < 0.01) factor = 1+overdrive;
+    }
+    const measuredVal = val * factor;
+    return {
+      id: i+1,
+      bands4: b4,
+      nominalVal: val,
+      measuredVal: measuredVal,
+      tolerance: tol,
+      isGood: isGood,
+    };
+  });
+}
+
+function calcResistor4(bands){
+  if(!bands || bands.length < 3) return NaN;
+  const d1 = bands[0]?.digit;
+  const d2 = bands[1]?.digit;
+  const mult = bands[2]?.mult;
+  if(d1==null||d2==null||mult==null) return NaN;
+  return (d1*10+d2)*mult;
+}
+
+function calcResistor5(bands){
+  if(!bands || bands.length < 4) return NaN;
+  const d1 = bands[0]?.digit;
+  const d2 = bands[1]?.digit;
+  const d3 = bands[2]?.digit;
+  const mult = bands[3]?.mult;
+  if(d1==null||d2==null||d3==null||mult==null) return NaN;
+  return (d1*100+d2*10+d3)*mult;
+}
+
+function formatOhm(val){
+  if(isNaN(val)||val==null) return {str:'---', unit:'Ω'};
+  if(val >= 1e6)  return {str:(val/1e6).toPrecision(4).replace(/\.?0+$/,''), unit:'MΩ'};
+  if(val >= 1e3)  return {str:(val/1e3).toPrecision(4).replace(/\.?0+$/,''), unit:'kΩ'};
+  return {str:val.toPrecision(4).replace(/\.?0+$/,''), unit:'Ω'};
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TAB NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function showTab(idx){
+  document.querySelectorAll('.section').forEach((s,i)=>{
+    s.classList.toggle('active', i===idx);
+  });
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active', i===idx);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TAB 2: COLOR CODE CALCULATOR
+// ═══════════════════════════════════════════════════════════════
+let numBands = 4;
+let selectedColors = ['Marrón','Negro','Rojo','Oro','','',''];
+
+function setBands(n){
+  numBands = n;
+  document.getElementById('btn4').style.background = n===4 ? 'var(--amber)' : 'var(--panel)';
+  document.getElementById('btn4').style.color = n===4 ? '#000' : 'var(--text)';
+  document.getElementById('btn4').style.border = n===4 ? 'none' : '1px solid var(--border)';
+  document.getElementById('btn5').style.background = n===5 ? 'var(--amber)' : 'var(--panel)';
+  document.getElementById('btn5').style.color = n===5 ? '#000' : 'var(--text)';
+  document.getElementById('btn5').style.border = n===5 ? 'none' : '1px solid var(--border)';
+  renderBandSelectors();
+  updateResistorVisual();
+  calcAndShow();
+}
+
+function renderBandSelectors(){
+  const container = document.getElementById('band-selectors');
+  const bandLabels4 = ['Banda 1\n(dígito)', 'Banda 2\n(dígito)', 'Multiplicador', 'Tolerancia'];
+  const bandLabels5 = ['Banda 1\n(dígito)', 'Banda 2\n(dígito)', 'Banda 3\n(dígito)', 'Multiplicador', 'Tolerancia'];
+  const labels = numBands === 4 ? bandLabels4 : bandLabels5;
+  const count = numBands;
+
+  // valid colors for each band type
+  const digitColors  = COLORS.filter(c=>c.digit!=null);
+  const multColors   = COLORS.filter(c=>c.mult!=null);
+  const tolColors    = COLORS.filter(c=>c.tol!=null);
+
+  let html = '';
+  for(let i=0;i<count;i++){
+    let opts;
+    const isLast = i===count-1;
+    const isMult = (numBands===4 && i===2) || (numBands===5 && i===3);
+    if(isLast) opts = tolColors;
+    else if(isMult) opts = multColors;
+    else opts = digitColors;
+
+    html += `<div class="band-group">
+      <div class="band-label">${labels[i]}</div>
+      <select class="band-select" id="bs${i}" onchange="onBandChange(${i},this.value)">`;
+    opts.forEach(c=>{
+      const sel = selectedColors[i]===c.name ? 'selected' : '';
+      html += `<option value="${c.name}" ${sel} style="background:var(--panel)">${c.name}</option>`;
+    });
+    html += `</select></div>`;
+  }
+  container.innerHTML = html;
+  // sync selectedColors
+  for(let i=0;i<count;i++){
+    const el = document.getElementById('bs'+i);
+    if(el) selectedColors[i] = el.value;
+  }
+}
+
+function onBandChange(i, val){
+  selectedColors[i] = val;
+  updateResistorVisual();
+  calcAndShow();
+}
+
+function updateResistorVisual(){
+  const bandIds = ['band1','band2','band3','band4','band5'];
+  const positions4 = [140,192,296,348,-999]; // band5 hidden for 4-band
+  const positions5 = [140,192,244,296,348];
+
+  const positions = numBands===4 ? positions4 : positions5;
+  const count = numBands;
+
+  bandIds.forEach((id,i)=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(i < count && selectedColors[i]){
+      const c = colorByName(selectedColors[i]);
+      el.setAttribute('fill', c ? c.hex : 'transparent');
+      el.setAttribute('opacity','1');
+    } else {
+      el.setAttribute('fill','transparent');
+      el.setAttribute('opacity','0');
+    }
+    // reposition
+    if(i < 5){
+      el.setAttribute('x', positions[i]);
+      el.setAttribute('opacity', i < count ? '1' : '0');
+    }
+  });
+
+  const divider = document.getElementById('tol-divider');
+  if(divider){
+    divider.setAttribute('x1', numBands===4 ? 332 : 332);
+    divider.setAttribute('x2', numBands===4 ? 332 : 332);
+  }
+}
+
+function calcAndShow(){
+  const bands = [];
+  for(let i=0;i<numBands;i++){
+    const c = colorByName(selectedColors[i]);
+    if(c) bands.push(c);
+  }
+  let val;
+  if(numBands===4) val = calcResistor4(bands);
+  else val = calcResistor5(bands);
+
+  const fmt = formatOhm(val);
+  const tolBand = bands[numBands-1];
+  const tolPct = tolBand ? tolBand.tol : null;
+
+  const valEl = document.getElementById('res-value');
+  const unitEl = document.getElementById('res-unit');
+  const tolRow = document.getElementById('tol-row');
+
+  if(isNaN(val)){
+    valEl.textContent = '—';
+    unitEl.textContent = 'Selección inválida';
+    tolRow.style.display = 'none';
+    return;
+  }
+
+  valEl.textContent = fmt.str + ' ' + fmt.unit;
+  unitEl.textContent = 'Valor Nominal';
+
+  if(tolPct){
+    tolRow.style.display = 'flex';
+    document.getElementById('tol-pct').textContent = '±'+tolPct+'%';
+    const lo = formatOhm(val*(1-tolPct/100));
+    const hi = formatOhm(val*(1+tolPct/100));
+    document.getElementById('tol-min').textContent = lo.str+' '+lo.unit;
+    document.getElementById('tol-max').textContent = hi.str+' '+hi.unit;
+  } else {
+    tolRow.style.display = 'none';
+  }
+}
+
+function buildColorRef(){
+  const container = document.getElementById('color-ref-table');
+  let html = '';
+  COLORS.forEach(c=>{
+    const parts = [];
+    if(c.digit!=null) parts.push(`D:${c.digit}`);
+    if(c.mult!=null)  parts.push(`×${c.mult>=1?c.mult.toExponential(0).replace('e+0','').replace('e','×10'):c.mult}`);
+    if(c.tol!=null)   parts.push(`±${c.tol}%`);
+    html += `<div class="cbr-item">
+      <div class="cbr-dot" style="background:${c.hex}"></div>
+      <span class="cbr-name">${c.name}</span>
+      <span class="cbr-val">${parts.join(' ')}</span>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TAB 3: VIRTUAL MULTIMETER
+// ═══════════════════════════════════════════════════════════════
+let selectedSlot = null;
+let knobAngle = 0;
+const knobModes = ['Ω','V~','V=','A=','Hz','°C'];
+let knobIdx = 0;
+
+function buildMeterSlots(){
+  const container = document.getElementById('meter-slots');
+  let html = '';
+  RESISTORS.forEach((r,i)=>{
+    const b = r.bands4;
+    const fmt = formatOhm(r.nominalVal);
+    const bandsHtml = b.map(c=>`<div class="slot-band" style="background:${c.hex};border-color:rgba(255,255,255,.2)"></div>`).join('');
+    html += `<div class="resistor-slot" id="slot${i}" onclick="selectSlot(${i})">
+      <div class="slot-num">${i+1}</div>
+      <div class="slot-bands">
+        <div style="display:flex;align-items:center;gap:0;background:#c8a96e;border-radius:4px;padding:4px 8px;gap:3px;">
+          ${bandsHtml}
+        </div>
+      </div>
+      <div class="slot-info">
+        <div class="slot-val" style="color:var(--muted)">Resistor R${i+1}</div>
+        <div>Leer el código de colores →</div>
+      </div>
+      <button class="measure-btn" onclick="measureSlot(event,${i})">MEDIR</button>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function selectSlot(i){
+  selectedSlot = i;
+  document.querySelectorAll('.resistor-slot').forEach((s,idx)=>{
+    s.classList.toggle('selected', idx===i);
+  });
+  setDisplay('0.L','kΩ','OHMS · Ω');
+}
+
+function measureSlot(evt, i){
+  evt.stopPropagation();
+  selectSlot(i);
+  const r = RESISTORS[i];
+  const mVal = r.measuredVal;
+  const fmt = formatOhm(mVal);
+  // animate display
+  setDisplay('----','kΩ','MIDIENDO...');
+  setTimeout(()=>{
+    setDisplay(fmt.str, fmt.unit, 'OHMS · Ω');
+    // Show detail
+    const tol = r.tolerance;
+    const lo = r.nominalVal*(1-tol/100);
+    const hi = r.nominalVal*(1+tol/100);
+    const inTol = mVal >= lo && mVal <= hi;
+    const nomFmt = formatOhm(r.nominalVal);
+    const pctDiff = ((mVal-r.nominalVal)/r.nominalVal*100).toFixed(2);
+    const area = document.getElementById('meter-result-area');
+    const detail = document.getElementById('meter-result-detail');
+    area.style.display = 'block';
+    detail.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:var(--bg);border-radius:5px;padding:10px;">
+          <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Valor por código</div>
+          <div style="font-size:22px;color:var(--amber)">${nomFmt.str} <span style="font-size:14px">${nomFmt.unit}</span></div>
+          <div style="font-size:10px;color:var(--muted);">Tolerancia ±${tol}%</div>
+        </div>
+        <div style="background:var(--bg);border-radius:5px;padding:10px;">
+          <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Medición directa</div>
+          <div style="font-size:22px;color:var(--cyan)">${fmt.str} <span style="font-size:14px">${fmt.unit}</span></div>
+          <div style="font-size:10px;color:var(--muted);">Desviación: ${pctDiff}%</div>
+        </div>
+      </div>
+      <div class="status-badge ${inTol?'good':'bad'}" style="margin-top:10px;">
+        ${inTol ? '✓ RESISTOR EN BUEN ESTADO' : '✗ RESISTOR FUERA DE TOLERANCIA'}
+      </div>
+    `;
+  }, 600);
+}
+
+function setDisplay(val, unit, mode){
+  document.getElementById('m-display').textContent = val;
+  document.getElementById('m-unit').textContent = unit;
+  document.getElementById('m-mode').textContent = mode;
+}
+
+// Knob interaction
+document.addEventListener('DOMContentLoaded', ()=>{
+  const knob = document.getElementById('knob');
+  if(knob){
+    knob.addEventListener('click', ()=>{
+      knobIdx = (knobIdx+1)%knobModes.length;
+      knobAngle += 36;
+      knob.style.transform = `rotate(${knobAngle}deg)`;
+      const inner = document.getElementById('knob-center');
+      if(inner) inner.style.transform = `rotate(${-knobAngle}deg)`;
+      document.getElementById('knob-label').textContent = knobModes[knobIdx];
+      const modes = {
+        'Ω':   ['0.L','kΩ','OHMS · Ω'],
+        'V~':  ['0.00','VAC','TENSIÓN · AC'],
+        'V=':  ['0.00','VDC','TENSIÓN · DC'],
+        'A=':  ['0.00','A','CORRIENTE · DC'],
+        'Hz':  ['0.0','Hz','FRECUENCIA'],
+        '°C':  ['---','°C','TEMPERATURA'],
+      };
+      const m = modes[knobModes[knobIdx]];
+      setDisplay(m[0], m[1], m[2]);
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  TAB 4: PRACTICE
+// ═══════════════════════════════════════════════════════════════
+let practiceState = []; // per-card state
+
+function generateResistorMiniSVG(bands, width=160){
+  const bHtml = bands.map(c=>`
+    <rect fill="${c.hex}" x="0" y="0" width="20" height="50" rx="2" stroke="rgba(255,255,255,.2)" stroke-width="1"/>
+  `);
+  const spacing = 26;
+  const startX = 30;
+  const rects = bands.map((c,i)=>`
+    <rect fill="${c.hex}" x="${startX+i*spacing}" y="9" width="18" height="42" rx="2" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
+  `).join('');
+  return `<svg viewBox="0 0 ${width} 60" style="width:${width}px;height:60px;">
+    <line x1="2" y1="30" x2="${startX}" y2="30" stroke="#888" stroke-width="2"/>
+    <line x1="${startX+bands.length*spacing+4}" y1="30" x2="${width-2}" y2="30" stroke="#888" stroke-width="2"/>
+    <rect x="${startX}" y="8" width="${bands.length*spacing+4}" height="44" rx="8" fill="#c8a96e" stroke="#a0814a" stroke-width="1.5"/>
+    ${rects}
+  </svg>`;
+}
+
+function buildPractice(){
+  const grid = document.getElementById('practice-grid');
+  practiceState = RESISTORS.map(()=>({ step:0, colorRead:null, measured:false }));
+  let html = '';
+  RESISTORS.forEach((r,i)=>{
+    html += `<div class="practice-card" id="pc${i}">
+      <div class="practice-header">
+        <div class="practice-num">${i+1}</div>
+        <div>
+          <h3>Resistor R${i+1}</h3>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono);">4 BANDAS</div>
+        </div>
+      </div>
+      <div class="practice-body">
+        <div class="mini-resistor">${generateResistorMiniSVG(r.bands4, 180)}</div>
+        <p style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px;font-family:var(--mono);">
+          Identificá cada banda de izquierda a derecha
+        </p>
+
+        <div class="input-group">
+          <label>Banda 1 (1er dígito)</label>
+          <select id="p${i}b0" onchange="practiceCalc(${i})">
+            ${COLORS.filter(c=>c.digit!=null).map(c=>`<option value="${c.name}">${c.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Banda 2 (2do dígito)</label>
+          <select id="p${i}b1" onchange="practiceCalc(${i})">
+            ${COLORS.filter(c=>c.digit!=null).map(c=>`<option value="${c.name}">${c.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Banda 3 (multiplicador)</label>
+          <select id="p${i}b2" onchange="practiceCalc(${i})">
+            ${COLORS.filter(c=>c.mult!=null).map(c=>`<option value="${c.name}">${c.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Banda 4 (tolerancia)</label>
+          <select id="p${i}b3" onchange="practiceCalc(${i})">
+            ${COLORS.filter(c=>c.tol!=null).map(c=>`<option value="${c.name}">${c.name}</option>`).join('')}
+          </select>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:12px;color:var(--muted);background:var(--bg);border-radius:5px;padding:8px;margin-bottom:8px;text-align:center;">
+          Tu lectura: <span id="p${i}calc" style="color:var(--amber);font-size:15px;">—</span>
+        </div>
+
+        <button class="btn-primary secondary" onclick="practiceMeasure(${i})">⚡ Medir con Multímetro</button>
+
+        <div class="result-box" id="p${i}result">
+          <!-- filled by js -->
+        </div>
+      </div>
+    </div>`;
+  });
+  grid.innerHTML = html;
+  // init calcs
+  RESISTORS.forEach((_,i)=>practiceCalc(i));
+}
+
+function practiceCalc(i){
+  const b0 = colorByName(document.getElementById(`p${i}b0`)?.value);
+  const b1 = colorByName(document.getElementById(`p${i}b1`)?.value);
+  const b2 = colorByName(document.getElementById(`p${i}b2`)?.value);
+  const b3 = colorByName(document.getElementById(`p${i}b3`)?.value);
+  if(!b0||!b1||!b2) return;
+  const val = calcResistor4([b0,b1,b2,b3||{}]);
+  const fmt = formatOhm(val);
+  const el = document.getElementById(`p${i}calc`);
+  if(el) el.textContent = isNaN(val) ? '—' : `${fmt.str} ${fmt.unit}`;
+  practiceState[i].colorRead = isNaN(val) ? null : val;
+  practiceState[i].tolerance = b3 ? b3.tol : null;
+}
+
+function practiceMeasure(i){
+  const r = RESISTORS[i];
+  const mVal = r.measuredVal;
+  const fmt = formatOhm(mVal);
+  const nomFmt = formatOhm(r.nominalVal);
+  const tol = r.tolerance;
+  const lo = r.nominalVal*(1-tol/100);
+  const hi = r.nominalVal*(1+tol/100);
+  const inTol = mVal >= lo && mVal <= hi;
+  const pctDiff = ((mVal-r.nominalVal)/r.nominalVal*100).toFixed(2);
+
+  // check student's color reading vs real
+  const studentVal = practiceState[i].colorRead;
+  const studentTol = practiceState[i].tolerance;
+  let readingStatus = '';
+  if(studentVal !== null){
+    const diff = Math.abs(studentVal - r.nominalVal)/r.nominalVal*100;
+    readingStatus = diff < 2 ? '<span style="color:var(--green)">✓ Lectura correcta</span>' : 
+                    diff < 15 ? '<span style="color:var(--amber)">~ Lectura aproximada</span>' :
+                    '<span style="color:var(--red)">✗ Revisar lectura</span>';
+  }
+
+  const rb = document.getElementById(`p${i}result`);
+  rb.classList.add('show');
+  rb.innerHTML = `
+    <div class="r-line"><span class="label">Valor nominal (código)</span><span class="value">${nomFmt.str} ${nomFmt.unit} ±${tol}%</span></div>
+    <div class="r-line"><span class="label">Tu lectura</span><span class="value ${studentVal && Math.abs(studentVal-r.nominalVal)/r.nominalVal<0.15 ? 'good':'bad'}">${studentVal ? formatOhm(studentVal).str+' '+formatOhm(studentVal).unit : '—'} ${readingStatus}</span></div>
+    <div class="r-line"><span class="label">Medición directa</span><span class="value">${fmt.str} ${fmt.unit}</span></div>
+    <div class="r-line"><span class="label">Desviación</span><span class="value ${inTol?'good':'bad'}">${pctDiff}%</span></div>
+    <div class="r-line"><span class="label">Rango aceptable</span><span class="value">${formatOhm(lo).str} – ${formatOhm(hi).str} ${formatOhm(hi).unit}</span></div>
+    <div class="status-badge ${inTol?'good':'bad'}">
+      ${inTol ? '✓ RESISTOR EN BUEN ESTADO' : '✗ RESISTOR DAÑADO / FUERA DE TOLERANCIA'}
+    </div>
+  `;
+
+  practiceState[i].measured = true;
+  checkSummary();
+}
+
+function checkSummary(){
+  if(practiceState.every(s=>s.measured)){
+    const summCard = document.getElementById('summary-card');
+    summCard.style.display = 'block';
+    const good = RESISTORS.filter(r=>r.isGood).length;
+    const bad  = RESISTORS.length - good;
+    document.getElementById('summary-content').innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;">
+        <div style="flex:1;min-width:160px;background:rgba(62,201,122,.1);border:1px solid var(--green);border-radius:6px;padding:16px;text-align:center;">
+          <div style="font-size:40px;font-family:var(--mono);color:var(--green)">${good}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;font-family:var(--head);letter-spacing:1px;text-transform:uppercase;">Resistores en buen estado</div>
+        </div>
+        <div style="flex:1;min-width:160px;background:rgba(224,82,82,.1);border:1px solid var(--red);border-radius:6px;padding:16px;text-align:center;">
+          <div style="font-size:40px;font-family:var(--mono);color:var(--red)">${bad}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;font-family:var(--head);letter-spacing:1px;text-transform:uppercase;">Resistores fuera de tolerancia</div>
+        </div>
+        <div style="flex:2;min-width:200px;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:16px;">
+          <div style="font-family:var(--head);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Conclusión</div>
+          <div style="font-size:13px;color:var(--text);">
+            ${bad===0 ? 'Todos los resistores se encuentran dentro de su tolerancia declarada. Pueden utilizarse con seguridad en circuitos.' :
+              bad===RESISTORS.length ? 'Ningún resistor se encuentra dentro de tolerancia. Todos deben ser reemplazados antes de su uso.' :
+              `${good} de ${RESISTORS.length} resistores están en buen estado. Los resistores dañados deben descartarse para evitar comportamientos inesperados en el circuito.`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function regeneratePractice(){
+  generateResistors();
+  buildMeterSlots();
+  buildPractice();
+  const summCard = document.getElementById('summary-card');
+  if(summCard) summCard.style.display='none';
+  selectedSlot = null;
+  setDisplay('0.L','kΩ','OHMS · Ω');
+  const area = document.getElementById('meter-result-area');
+  if(area){ area.style.display='none'; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+generateResistors();
+setBands(4);
+buildColorRef();
+buildMeterSlots();
+buildPractice();
+updateResistorVisual();
+calcAndShow();
+</script>
+</body>
+</html>
