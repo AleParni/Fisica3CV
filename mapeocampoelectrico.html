@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Práctico #1 — Mapeo de Campo Eléctrico</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #080c12;
+  --s1:      #0e1520;
+  --s2:      #141e2e;
+  --border:  #1e3050;
+  --blue:    #00e5ff;
+  --blue2:   #00b8cc;
+  --yellow:  #ffe066;
+  --red:     #ff4d6d;
+  --green:   #39ff8a;
+  --orange:  #ff9f1c;
+  --text:    #cdd8e8;
+  --muted:   #506080;
+  --mono:    'Share Tech Mono', monospace;
+  --head:    'Rajdhani', sans-serif;
+  --body:    'Barlow', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--body);
+  font-size:15px;
+  line-height:1.6;
+}
+
+/* grid bg */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;
+}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:10;
+  background:linear-gradient(135deg,#05111e,#091826);
+  border-bottom:2px solid var(--blue);
+  padding:20px 32px;
+  display:flex;align-items:center;gap:20px;
+}
+.hdr-icon{
+  font-size:36px;
+  line-height:1;
+  filter:drop-shadow(0 0 8px var(--blue));
+}
+.hdr-text h1{
+  font-family:var(--head);
+  font-size:22px;font-weight:700;
+  letter-spacing:1px;
+  color:#fff;
+  text-transform:uppercase;
+  line-height:1.1;
+}
+.hdr-text p{
+  font-family:var(--mono);
+  font-size:10px;letter-spacing:2px;
+  color:var(--blue);
+  text-transform:uppercase;
+  margin-top:3px;
+}
+.hdr-badge{
+  margin-left:auto;
+  font-family:var(--mono);
+  font-size:9px;letter-spacing:1.5px;
+  color:var(--muted);
+  text-align:right;
+  line-height:2;
+  text-transform:uppercase;
+}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:20;
+  background:rgba(8,12,18,.95);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+  display:flex;padding:0 20px;gap:0;
+  overflow-x:auto;
+}
+.tb{
+  font-family:var(--head);
+  font-size:12px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--muted);
+  background:none;border:none;
+  padding:13px 18px;
+  cursor:pointer;
+  border-bottom:3px solid transparent;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.tb:hover{color:var(--text);}
+.tb.on{color:var(--blue);border-bottom-color:var(--blue);}
+
+/* ── MAIN ── */
+main{
+  position:relative;z-index:5;
+  max-width:980px;
+  margin:0 auto;
+  padding:32px 20px 72px;
+}
+.sec{display:none;}
+.sec.on{display:block;animation:fi .25s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SECTION TITLE ── */
+.stitle{
+  font-family:var(--head);
+  font-size:28px;font-weight:700;
+  text-transform:uppercase;letter-spacing:2px;
+  color:#fff;margin-bottom:4px;
+}
+.stitle span{color:var(--blue);}
+.ssub{
+  font-family:var(--mono);font-size:10px;letter-spacing:2px;
+  color:var(--muted);text-transform:uppercase;
+  margin-bottom:24px;
+}
+
+/* ── CARD ── */
+.card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:22px;
+  margin-bottom:18px;
+}
+.ctitle{
+  font-family:var(--head);
+  font-size:13px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  color:var(--blue);
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.ctitle::before{
+  content:'';display:inline-block;
+  width:3px;height:14px;
+  background:var(--blue);border-radius:2px;
+}
+
+/* ── ALERTS ── */
+.alert{
+  border-radius:5px;padding:12px 16px;
+  font-size:13px;margin-bottom:16px;
+  display:flex;gap:10px;align-items:flex-start;
+  line-height:1.5;
+}
+.al-blue{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.25);color:#7de8f5;}
+.al-yellow{background:rgba(255,224,102,.08);border:1px solid rgba(255,224,102,.25);color:#f5dfa0;}
+.al-red{background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.25);color:#f5a0b0;}
+.al-green{background:rgba(57,255,138,.08);border:1px solid rgba(57,255,138,.25);color:#90f5b8;}
+.al-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+
+/* ── REGLAS DEL CAMPO ── */
+.rules-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:14px;
+  margin-top:12px;
+}
+.rule-card{
+  background:var(--s2);
+  border:1px solid var(--border);
+  border-radius:6px;padding:16px;
+  display:flex;gap:12px;align-items:flex-start;
+}
+.rule-icon{
+  font-size:26px;line-height:1;flex-shrink:0;
+  margin-top:2px;
+}
+.rule-card h4{
+  font-family:var(--head);font-size:13px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;
+  color:var(--yellow);margin-bottom:4px;
+}
+.rule-card p{font-size:12px;color:var(--muted);}
+
+/* ── FÓRMULA ── */
+.formula-box{
+  background:#040810;
+  border:1px solid var(--border);
+  border-radius:6px;padding:16px 24px;
+  text-align:center;
+  font-family:var(--mono);
+  margin:14px 0;
+}
+.formula-box .f-main{
+  font-size:26px;color:var(--blue);
+  letter-spacing:2px;
+  text-shadow:0 0 10px rgba(0,229,255,.4);
+}
+.formula-box .f-desc{font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:1px;}
+
+/* ── TWO-COLUMN ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+/* ── FASE BADGE ── */
+.fase-header{
+  display:flex;align-items:center;gap:10px;
+  background:var(--s2);
+  border:1px solid var(--border);
+  border-left:4px solid var(--blue);
+  border-radius:0 6px 6px 0;
+  padding:10px 16px;
+  margin-bottom:14px;
+}
+.fase-num{
+  width:30px;height:30px;
+  background:var(--blue);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--head);font-size:15px;font-weight:700;
+  color:#000;flex-shrink:0;
+}
+.fase-header h3{
+  font-family:var(--head);font-size:15px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;color:#fff;
+}
+.fase-header .fase-tag{
+  margin-left:auto;
+  font-family:var(--mono);font-size:9px;letter-spacing:1.5px;
+  padding:3px 8px;border-radius:3px;
+  text-transform:uppercase;
+}
+.tag-emp{background:rgba(57,255,138,.15);color:var(--green);border:1px solid rgba(57,255,138,.3);}
+.tag-teo{background:rgba(255,159,28,.15);color:var(--orange);border:1px solid rgba(255,159,28,.3);}
+
+/* ── SIMULATOR ── */
+#sim-canvas{
+  display:block;
+  background:#040c18;
+  border:1px solid var(--border);
+  border-radius:6px;
+  cursor:crosshair;
+  width:100%;
+  max-width:700px;
+  margin:0 auto;
+}
+.sim-controls{
+  display:flex;gap:10px;flex-wrap:wrap;
+  align-items:center;
+  margin-bottom:12px;
+}
+.sim-btn{
+  font-family:var(--head);font-size:12px;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;
+  padding:7px 16px;border-radius:4px;border:none;
+  cursor:pointer;transition:all .15s;
+}
+.sim-btn.primary{background:var(--blue);color:#000;}
+.sim-btn.primary:hover{background:var(--blue2);}
+.sim-btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text);}
+.sim-btn.ghost:hover{border-color:var(--blue);color:var(--blue);}
+.sim-btn.danger{background:rgba(255,77,109,.15);border:1px solid rgba(255,77,109,.3);color:var(--red);}
+.sim-btn.danger:hover{background:rgba(255,77,109,.25);}
+.sim-select{
+  background:var(--s2);border:1px solid var(--border);
+  color:var(--text);font-family:var(--mono);font-size:12px;
+  padding:7px 12px;border-radius:4px;cursor:pointer;
+}
+.sim-select:focus{outline:none;border-color:var(--blue);}
+.voltage-indicator{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:13px;
+}
+.vi-dot{
+  width:12px;height:12px;border-radius:50%;
+}
+.mode-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;
+  padding:4px 10px;border-radius:3px;
+  background:rgba(0,229,255,.1);
+  border:1px solid rgba(0,229,255,.3);
+  color:var(--blue);
+}
+
+/* ── DATA TABLE ── */
+.data-table{
+  width:100%;border-collapse:collapse;
+  font-family:var(--mono);font-size:12px;
+  margin-top:12px;
+}
+.data-table th{
+  background:var(--s2);
+  color:var(--blue);
+  font-family:var(--head);font-size:10px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  padding:8px 10px;text-align:left;
+  border-bottom:2px solid var(--blue);
+}
+.data-table td{
+  padding:6px 10px;
+  border-bottom:1px solid var(--border);
+  vertical-align:middle;
+}
+.data-table tr:hover td{background:rgba(255,255,255,.02);}
+.data-table input{
+  background:var(--bg);border:1px solid var(--border);
+  color:var(--text);font-family:var(--mono);font-size:12px;
+  padding:4px 8px;border-radius:3px;width:80px;
+  text-align:center;
+}
+.data-table input:focus{outline:none;border-color:var(--blue);}
+
+/* ── CALC PANEL ── */
+.calc-panel{
+  background:#040810;
+  border:1px solid var(--border);
+  border-radius:6px;padding:18px;
+  font-family:var(--mono);
+  margin-top:14px;
+}
+.calc-row{
+  display:flex;align-items:center;gap:10px;
+  flex-wrap:wrap;margin-bottom:10px;font-size:13px;
+}
+.calc-row label{color:var(--muted);font-size:11px;letter-spacing:1px;white-space:nowrap;}
+.calc-inp{
+  background:var(--s2);border:1px solid var(--border);
+  color:var(--text);font-family:var(--mono);font-size:13px;
+  padding:6px 10px;border-radius:4px;width:110px;
+}
+.calc-inp:focus{outline:none;border-color:var(--blue);}
+.calc-result{
+  font-size:22px;color:var(--yellow);
+  text-shadow:0 0 8px rgba(255,224,102,.3);
+  letter-spacing:2px;
+}
+.calc-result-lbl{font-size:10px;color:var(--muted);letter-spacing:1px;}
+
+/* ── CHECKLIST ── */
+.checklist{list-style:none;padding:0;}
+.checklist li{
+  display:flex;gap:10px;align-items:flex-start;
+  padding:8px 0;
+  border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+.checklist li:last-child{border-bottom:none;}
+.check-icon{
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:2px;
+  font-size:10px;cursor:pointer;
+  transition:all .2s;
+}
+.check-icon.done{background:var(--green);border-color:var(--green);color:#000;}
+.checklist li.done-li{color:var(--muted);}
+
+/* ── COMPARE TABLE ── */
+.compare-row{
+  display:grid;grid-template-columns:3fr 1fr 1fr 1fr 1fr;
+  gap:8px;align-items:center;
+  padding:8px 12px;
+  background:var(--s2);border-radius:4px;margin-bottom:6px;
+  font-family:var(--mono);font-size:12px;
+}
+.compare-head{
+  font-family:var(--head);font-size:10px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.badge-emp{
+  display:inline-block;
+  padding:2px 8px;border-radius:3px;font-size:10px;
+  background:rgba(57,255,138,.1);color:var(--green);
+  border:1px solid rgba(57,255,138,.3);
+  font-family:var(--head);letter-spacing:1px;
+}
+.badge-teo{
+  display:inline-block;
+  padding:2px 8px;border-radius:3px;font-size:10px;
+  background:rgba(255,159,28,.1);color:var(--orange);
+  border:1px solid rgba(255,159,28,.3);
+  font-family:var(--head);letter-spacing:1px;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:5;
+  text-align:center;padding:18px;
+  font-family:var(--mono);font-size:9px;
+  color:var(--muted);
+  border-top:1px solid var(--border);
+  letter-spacing:1.5px;text-transform:uppercase;
+}
+
+@media(max-width:680px){
+  .two-col,.three-col,.rules-grid{grid-template-columns:1fr;}
+  header{flex-wrap:wrap;}
+  .hdr-badge{display:none;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">⚡</div>
+  <div class="hdr-text">
+    <h1>Mapeo de Campo Eléctrico</h1>
+    <p>Práctico #1 · Laboratorio de Física · Liceo Dr. J. Belza</p>
+  </div>
+  <div class="hdr-badge">
+    Prof. Tgo. Alejandro Parnizari<br>
+    Física 2° CT · 2026 · v4.0
+  </div>
+</header>
+
+<nav>
+  <button class="tb on" onclick="go(0)">① Objetivos</button>
+  <button class="tb" onclick="go(1)">② Marco Teórico</button>
+  <button class="tb" onclick="go(2)">③ Reglas del Campo</button>
+  <button class="tb" onclick="go(3)">④ Simulador</button>
+  <button class="tb" onclick="go(4)">⑤ Datos Empíricos</button>
+  <button class="tb" onclick="go(5)">⑥ Cálculo Teórico</button>
+  <button class="tb" onclick="go(6)">⑦ Comparación</button>
+</nav>
+
+<main>
+
+<!-- ══ 0: OBJETIVOS ══ -->
+<section class="sec on" id="s0">
+  <p class="stitle">Objetivos del <span>Práctico</span></p>
+  <p class="ssub">// Práctico #1 — Campo Eléctrico y Potencial</p>
+
+  <div class="alert al-blue">
+    <span class="al-icon">💡</span>
+    <span>Este práctico tiene <strong>dos momentos bien diferenciados</strong>: primero vas a obtener datos de forma <strong>empírica</strong> (midiendo con el voltímetro), y luego vas a calcular el campo eléctrico de forma <strong>teórica</strong> usando esos datos. Compararlos te dirá si tu experimento fue exitoso.</span>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">¿Qué estudiaremos?</div>
+    <p style="margin-bottom:12px;">El <strong style="color:var(--blue)">campo eléctrico</strong> existe en una región del espacio si se detectan fuerzas electrostáticas sobre una carga de prueba en reposo en dicha zona. A cada punto del espacio se le asigna un vector <strong style="color:var(--blue)">E⃗</strong>, y se puede asociar una magnitud escalar: el <strong style="color:var(--yellow)">potencial eléctrico V</strong>.</p>
+    <p style="font-size:13px;color:var(--muted);">En experimentos con placas paralelas conectadas a una fuente de tensión constante, podemos mapear ambas magnitudes y descubrir su relación.</p>
+  </div>
+
+  <div class="three-col">
+    <div class="card" style="text-align:center;border-top:3px solid var(--green);">
+      <div style="font-size:32px;margin-bottom:8px;">🔬</div>
+      <div style="font-family:var(--head);font-size:13px;font-weight:700;letter-spacing:1px;color:var(--green);text-transform:uppercase;margin-bottom:6px;">Parte Empírica</div>
+      <div style="font-size:12px;color:var(--muted);">Medir voltajes con el multímetro. Trazar equipotenciales sobre papel milimetrado.</div>
+      <div class="badge-emp" style="margin-top:10px;">Medición directa</div>
+    </div>
+    <div class="card" style="text-align:center;border-top:3px solid var(--orange);">
+      <div style="font-size:32px;margin-bottom:8px;">📐</div>
+      <div style="font-family:var(--head);font-size:13px;font-weight:700;letter-spacing:1px;color:var(--orange);text-transform:uppercase;margin-bottom:6px;">Parte Teórica</div>
+      <div style="font-size:12px;color:var(--muted);">Calcular E⃗ a partir de los datos. Representar vectores y líneas de campo a escala.</div>
+      <div class="badge-teo" style="margin-top:10px;">Cálculo derivado</div>
+    </div>
+    <div class="card" style="text-align:center;border-top:3px solid var(--blue);">
+      <div style="font-size:32px;margin-bottom:8px;">⚖️</div>
+      <div style="font-family:var(--head);font-size:13px;font-weight:700;letter-spacing:1px;color:var(--blue);text-transform:uppercase;margin-bottom:6px;">Comparación</div>
+      <div style="font-size:12px;color:var(--muted);">Confrontar ambos resultados y sacar conclusiones sobre la geometría del campo.</div>
+      <div style="display:inline-block;margin-top:10px;padding:2px 8px;border-radius:3px;font-size:10px;background:rgba(0,229,255,.1);color:var(--blue);border:1px solid rgba(0,229,255,.3);font-family:var(--head);letter-spacing:1px;">Análisis</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Pregunta disparadora</div>
+    <div style="background:var(--s2);border-radius:6px;padding:16px;border-left:4px solid var(--yellow);">
+      <p style="font-size:14px;font-style:italic;color:var(--yellow);">"Para encender un LED necesitamos una batería. Sin embargo, algunos LEDs encienden con sus patas aparentemente sin conexión. ¿Por qué?"</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:8px;">→ El campo eléctrico generado por la fuente se extiende por el espacio. Las cargas en el conductor del LED responden a ese campo, aún sin contacto directo con la batería.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ 1: MARCO TEÓRICO ══ -->
+<section class="sec" id="s1">
+  <p class="stitle">Marco <span>Teórico</span></p>
+  <p class="ssub">// Relación entre campo eléctrico y potencial</p>
+
+  <!-- 1. Campo eléctrico -->
+  <div class="card">
+    <div class="ctitle">1. Campo Eléctrico — Definición</div>
+    <p style="margin-bottom:12px;">Se dice que en una región del espacio existe un <strong style="color:var(--blue)">campo eléctrico E⃗</strong> si una carga de prueba <em>q₀</em> en reposo experimenta una fuerza electrostática en dicha región. El campo en cada punto se define como la fuerza por unidad de carga:</p>
+    <div class="formula-box">
+      <div class="f-main">E⃗ = F⃗ / q₀</div>
+      <div class="f-desc">E⃗ es vectorial · F⃗ es la fuerza sobre q₀ · Unidad: N/C = V/m</div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-top:10px;">El campo <strong style="color:var(--text)">no depende de la carga de prueba</strong>: es una propiedad del espacio creada por las cargas fuente (en nuestro caso, las placas metálicas conectadas a la fuente de tensión). Retirar q₀ no elimina el campo.</p>
+  </div>
+
+  <!-- 2. Trabajo y potencial -->
+  <div class="card">
+    <div class="ctitle">2. Trabajo Eléctrico y Potencial</div>
+    <p style="margin-bottom:12px;">Cuando el campo mueve la carga q₀ desde el punto A hasta el punto B, realiza un trabajo <strong style="color:var(--text)">escalar</strong> T<sub>AB</sub>. Este trabajo depende únicamente de las posiciones A y B, no del camino recorrido — eso lo convierte en un campo <em>conservativo</em>.</p>
+    <div class="formula-box">
+      <div class="f-main">T<sub>AB</sub> / q₀ = V<sub>A</sub> − V<sub>B</sub> = −ΔV</div>
+      <div class="f-desc">T<sub>AB</sub> es escalar (Joules) · V es el potencial eléctrico (Volts) · ΔV = V<sub>B</sub> − V<sub>A</sub></div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-top:10px;">El <strong style="color:var(--yellow)">potencial eléctrico V</strong> es una magnitud <em>escalar</em> asociada a cada punto del espacio. Su diferencia entre dos puntos (d.d.p.) es lo que medimos directamente con el voltímetro. Notar que el trabajo es positivo cuando la carga se desplaza desde mayor a menor potencial (a favor del campo).</p>
+    <div class="alert al-blue" style="margin-top:12px;margin-bottom:0;">
+      <span class="al-icon">🔑</span>
+      <span><strong>Distinción clave:</strong> E⃗ es vectorial (tiene módulo, dirección y sentido). V es escalar (solo tiene valor numérico en cada punto). El voltímetro mide V directamente; el campo E⃗ se <em>deduce</em> a partir de V.</span>
+    </div>
+  </div>
+
+  <!-- 3. Superficies equipotenciales -->
+  <div class="card">
+    <div class="ctitle">3. Superficies Equipotenciales</div>
+    <p style="margin-bottom:12px;">Una <strong style="color:var(--blue)">superficie equipotencial</strong> es el conjunto de puntos del espacio que tienen el mismo valor de potencial V. Al desplazarse sobre ella, ΔV = 0 y por lo tanto el campo no realiza trabajo:</p>
+    <div class="formula-box">
+      <div class="f-main">T<sub>AB</sub> = q₀ · (V<sub>A</sub> − V<sub>B</sub>) = 0 &nbsp; si V<sub>A</sub> = V<sub>B</sub></div>
+      <div class="f-desc">Moverse sobre una equipotencial no requiere trabajo → F⃗ · Δs⃗ = 0</div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-top:10px;">Esto implica que la fuerza eléctrica (y por tanto E⃗) es siempre <strong style="color:var(--text)">perpendicular</strong> a la equipotencial. En placas paralelas las equipotenciales son planos paralelos a las placas; en una carga puntual son esferas concéntricas.</p>
+  </div>
+
+  <!-- 4. Relación campo-potencial -->
+  <div class="card">
+    <div class="ctitle">4. Relación entre Campo y Potencial</div>
+    <p style="margin-bottom:12px;">Combinando la definición de campo con la relación trabajo-potencial, y considerando un desplazamiento Δs perpendicular a las equipotenciales (es decir, en la dirección del campo), se obtiene:</p>
+    <div class="formula-box" style="border-color:rgba(255,224,102,.35);">
+      <div class="f-main" style="color:var(--yellow);">E = − ΔV / Δs</div>
+      <div class="f-desc" style="color:rgba(255,224,102,.5);">Módulo del campo · ΔV en Volts · Δs en metros → E en V/m</div>
+    </div>
+    <div class="alert al-yellow" style="margin-top:12px;margin-bottom:12px;">
+      <span class="al-icon">⚠</span>
+      <span>El signo negativo no es un detalle menor: indica que el campo <strong>apunta hacia donde el potencial decrece</strong>. Si V<sub>A</sub> = 9 V y V<sub>B</sub> = 3 V, el campo apunta de A hacia B. ΔV es negativo → E es positivo → el campo "empuja" de mayor a menor V.</span>
+    </div>
+    <p style="font-size:13px;color:var(--muted);">Esta ecuación es la herramienta central del práctico: a partir de los valores de V que medís con el voltímetro y las distancias entre equipotenciales sobre el papel milimetrado, podés calcular el módulo del campo en cada zona.</p>
+  </div>
+
+  <!-- 5. Gradiente -->
+  <div class="card">
+    <div class="ctitle">5. El Campo como Gradiente del Potencial</div>
+    <p style="margin-bottom:12px;">La expresión anterior, generalizada a tres dimensiones, se escribe como:</p>
+    <div class="formula-box">
+      <div class="f-main" style="color:var(--green);">E⃗ = − grad(V)</div>
+      <div class="f-desc" style="color:rgba(57,255,138,.5);">El gradiente apunta en la dirección de máximo crecimiento de V; el campo apunta en sentido contrario</div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-top:10px;">El gradiente es una medida de cuán rápido varía el potencial con la posición. Dos consecuencias directas para el experimento:</p>
+    <div class="two-col" style="margin-top:12px;">
+      <div style="background:var(--s2);border-radius:5px;padding:14px;border-left:3px solid var(--red);">
+        <div style="font-family:var(--head);font-size:12px;font-weight:700;letter-spacing:1px;color:var(--red);text-transform:uppercase;margin-bottom:6px;">Equipotenciales juntas</div>
+        <p style="font-size:12px;color:var(--muted);">ΔV es grande en poco Δs → gradiente grande → campo <strong style="color:var(--text)">intenso</strong>.</p>
+      </div>
+      <div style="background:var(--s2);border-radius:5px;padding:14px;border-left:3px solid var(--green);">
+        <div style="font-family:var(--head);font-size:12px;font-weight:700;letter-spacing:1px;color:var(--green);text-transform:uppercase;margin-bottom:6px;">Equipotenciales separadas</div>
+        <p style="font-size:12px;color:var(--muted);">ΔV es pequeño para gran Δs → gradiente pequeño → campo <strong style="color:var(--text)">débil</strong>.</p>
+      </div>
+    </div>
+    <div class="alert al-blue" style="margin-top:14px;margin-bottom:0;">
+      <span class="al-icon">📐</span>
+      <span>En el caso ideal de <strong>placas paralelas infinitas</strong> el campo es uniforme: las equipotenciales son equidistantes y paralelas, y E tiene el mismo valor en todos los puntos. En la práctica real aparecen efectos de borde en los extremos de las placas donde esta uniformidad se rompe.</span>
+    </div>
+  </div>
+
+  <!-- 6. Plano de trabajo -->
+  <div class="card">
+    <div class="ctitle">6. El Experimento en el Plano</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">En nuestro montaje trabajamos en dos dimensiones (el plano del papel milimetrado). El voltímetro tiene una punta fija sobre una placa y una punta libre que movemos. Cuando la lectura no cambia al mover la punta libre, estamos sobre una equipotencial. Registrando varios puntos de igual voltaje trazamos esa línea en el papel.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <div style="background:var(--s2);border-radius:5px;padding:12px;text-align:center;">
+        <div style="font-size:22px;margin-bottom:6px;">🔌</div>
+        <div style="font-family:var(--head);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--blue);text-transform:uppercase;margin-bottom:4px;">Paso 1</div>
+        <div style="font-size:11px;color:var(--muted);">Fijar tensión de la fuente y registrarla</div>
+      </div>
+      <div style="background:var(--s2);border-radius:5px;padding:12px;text-align:center;">
+        <div style="font-size:22px;margin-bottom:6px;">🖊</div>
+        <div style="font-family:var(--head);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--blue);text-transform:uppercase;margin-bottom:4px;">Paso 2</div>
+        <div style="font-size:11px;color:var(--muted);">Mover punta libre hasta obtener voltaje constante → anotar (x, y)</div>
+      </div>
+      <div style="background:var(--s2);border-radius:5px;padding:12px;text-align:center;">
+        <div style="font-size:22px;margin-bottom:6px;">📏</div>
+        <div style="font-family:var(--head);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--blue);text-transform:uppercase;margin-bottom:4px;">Paso 3</div>
+        <div style="font-size:11px;color:var(--muted);">Medir Δs entre equipotenciales y calcular E = |ΔV/Δs|</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ 2: REGLAS ══ -->
+<section class="sec" id="s2">
+  <p class="stitle">Reglas del <span>Campo Eléctrico</span></p>
+  <p class="ssub">// Propiedades fundamentales de las líneas de campo y equipotenciales</p>
+
+  <div class="alert al-blue">
+    <span class="al-icon">📌</span>
+    <span>Estas cuatro reglas son el núcleo del práctico. Cada una tiene una consecuencia directa en cómo vas a trazar tus líneas sobre el papel milimetrado.</span>
+  </div>
+
+  <div class="rules-grid">
+    <div class="rule-card">
+      <div class="rule-icon">➕➡➖</div>
+      <div>
+        <h4>Regla 1 — Sentido</h4>
+        <p>Las líneas de campo van <strong style="color:var(--text)">del positivo (+) al negativo (−)</strong>. Nunca al revés. La fuente de tensión establece cuál placa es + y cuál es −.</p>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">📉</div>
+      <div>
+        <h4>Regla 2 — Potencial</h4>
+        <p>Las líneas apuntan <strong style="color:var(--text)">hacia donde el potencial disminuye</strong>. Si V<sub>A</sub> = 9V y V<sub>B</sub> = 3V, el campo apunta de A hacia B.</p>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">🚫✖</div>
+      <div>
+        <h4>Regla 3 — No se cruzan</h4>
+        <p>Dos líneas de campo <strong style="color:var(--text)">nunca se cruzan</strong>. En un punto de cruce existirían dos direcciones de campo simultáneamente, lo cual es físicamente imposible.</p>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">⊥</div>
+      <div>
+        <h4>Regla 4 — Perpendicularidad</h4>
+        <p>Las líneas de campo son <strong style="color:var(--text)">perpendiculares</strong> a las superficies equipotenciales en todo punto. Moverse a lo largo de una equipotencial no requiere trabajo.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert al-green" style="margin-top:16px;">
+    <span class="al-icon">🧪</span>
+    <span>Estas cuatro reglas las vas a <strong>verificar vos mismo</strong> a partir de las mediciones de voltaje. Al trazar tus equipotenciales sobre el papel milimetrado y luego deducir las líneas de campo, podés confirmar (o cuestionar) cada una de ellas con tus propios datos.</span>
+  </div>
+</section>
+
+
+<!-- ══ 3: SIMULADOR ══ -->
+<section class="sec" id="s3">
+  <p class="stitle"><span>Simulador</span> Interactivo</p>
+  <p class="ssub">// Explorá el campo antes del experimento real</p>
+
+  <div class="alert al-yellow">
+    <span class="al-icon">🖱</span>
+    <span>Hacé click en el canvas para colocar el voltímetro virtual. Observá cómo varía el potencial según la posición y la configuración. <strong>Las líneas de campo no se muestran: las vas a deducir vos a partir de las equipotenciales.</strong></span>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Configuración</div>
+    <div class="sim-controls">
+      <select class="sim-select" id="cfg" onchange="updateSim()">
+        <option value="parallel">Placas paralelas</option>
+        <option value="angled">Placas en ángulo</option>
+        <option value="point">Carga puntual</option>
+      </select>
+      <select class="sim-select" id="voltage" onchange="updateSim()">
+        <option value="12">12 V</option>
+        <option value="9" selected>9 V</option>
+        <option value="6">6 V</option>
+      </select>
+      <button class="sim-btn danger" onclick="clearProbe()">Limpiar cursor</button>
+      <div class="voltage-indicator">
+        <div class="vi-dot" style="background:var(--blue)"></div>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--blue);" id="probe-val">Click para medir</span>
+      </div>
+    </div>
+
+    <canvas id="sim-canvas" width="700" height="350"></canvas>
+
+    <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px;">
+        <span style="display:inline-block;width:20px;height:0;border-top:2px dashed #1a7acc;"></span> Equipotenciales
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px;">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#e8a000;"></span> Punto de medición (voltímetro)
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ 4: DATOS EMPÍRICOS ══ -->
+<section class="sec" id="s4">
+  <p class="stitle">Datos <span>Empíricos</span></p>
+  <p class="ssub">// Fase 1: Medición directa con voltímetro — sin cálculos aún</p>
+
+  <div class="fase-header">
+    <div class="fase-num">1</div>
+    <div>
+      <h3>Obtención de equipotenciales</h3>
+      <div style="font-size:12px;color:var(--muted);">Registrá las coordenadas (x, y) de los puntos de igual voltaje</div>
+    </div>
+    <div class="fase-tag tag-emp">Empírico</div>
+  </div>
+
+  <div class="alert al-green">
+    <span class="al-icon">🔌</span>
+    <span>Armá el circuito con la fuente, las dos placas y el voltímetro. <strong>No hagas ningún cálculo todavía.</strong> Tu trabajo en esta fase es medir y registrar. El análisis viene después.</span>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Datos del instrumento</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-family:var(--mono);font-size:12px;">
+      <div>
+        <div style="color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Tensión de la fuente</div>
+        <input class="calc-inp" id="v-fuente" type="number" placeholder="V" style="width:100%;"> <span style="color:var(--muted)">V</span>
+      </div>
+      <div>
+        <div style="color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Escala del voltímetro</div>
+        <input class="calc-inp" id="v-escala" type="text" placeholder="ej: 20V DC" style="width:100%;">
+      </div>
+      <div>
+        <div style="color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Apreciación</div>
+        <input class="calc-inp" id="v-aprec" type="text" placeholder="ej: 0.1V" style="width:100%;">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Tabla de Equipotenciales</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Registrá las coordenadas (en mm sobre el papel milimetrado) de los puntos que tienen el mismo voltaje.</p>
+    <table class="data-table" id="equipot-table">
+      <thead>
+        <tr>
+          <th>Punto #</th>
+          <th>V1 x (mm)</th><th>V1 y (mm)</th>
+          <th>V2 x (mm)</th><th>V2 y (mm)</th>
+          <th>V3 x (mm)</th><th>V3 y (mm)</th>
+          <th>V4 x (mm)</th><th>V4 y (mm)</th>
+          <th>V5 x (mm)</th><th>V5 y (mm)</th>
+        </tr>
+      </thead>
+      <tbody id="equipot-body">
+      </tbody>
+    </table>
+    <div style="margin-top:10px;display:flex;gap:8px;">
+      <button class="sim-btn primary" onclick="addRow()">+ Agregar fila</button>
+      <button class="sim-btn ghost" onclick="removeRow()">− Quitar última</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Distancia entre placas</div>
+    <div style="display:flex;align-items:center;gap:12px;font-family:var(--mono);">
+      <label style="color:var(--muted);font-size:11px;">Distancia total placa A → placa B:</label>
+      <input class="calc-inp" id="d-placas" type="number" placeholder="mm"> 
+      <span style="color:var(--muted)">mm</span>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:8px;">Este valor lo vas a usar en la parte teórica para calcular el campo uniforme esperado.</p>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Observaciones cualitativas</div>
+    <ul class="checklist" id="obs-list">
+      <li onclick="toggleCheck(0)"><div class="check-icon" id="ck0">✓</div><span>¿Las equipotenciales son rectas y paralelas entre sí?</span></li>
+      <li onclick="toggleCheck(1)"><div class="check-icon" id="ck1">✓</div><span>¿Las equipotenciales son perpendiculares a las placas?</span></li>
+      <li onclick="toggleCheck(2)"><div class="check-icon" id="ck2">✓</div><span>¿La separación entre equipotenciales es uniforme?</span></li>
+      <li onclick="toggleCheck(3)"><div class="check-icon" id="ck3">✓</div><span>¿El potencial decrece del + al −?</span></li>
+      <li onclick="toggleCheck(4)"><div class="check-icon" id="ck4">✓</div><span>¿Hay efectos de borde cerca de los extremos de las placas?</span></li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ══ 5: CÁLCULO TEÓRICO ══ -->
+<section class="sec" id="s5">
+  <p class="stitle">Cálculo <span>Teórico</span></p>
+  <p class="ssub">// Fase 2: Derivar E⃗ a partir de los datos empíricos</p>
+
+  <div class="fase-header">
+    <div class="fase-num">2</div>
+    <div>
+      <h3>Cálculo del campo E⃗</h3>
+      <div style="font-size:12px;color:var(--muted);">Usamos los voltajes y distancias ya medidos para calcular el módulo del campo</div>
+    </div>
+    <div class="fase-tag tag-teo">Teórico</div>
+  </div>
+
+  <div class="alert al-yellow">
+    <span class="al-icon">⚠</span>
+    <span>Esta fase usa los datos que ya obtuviste. <strong>No midas nada nuevo aquí.</strong> Los valores de ΔV y Δs vienen de la tabla anterior.</span>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Calculadora E = |ΔV / Δs|</div>
+    <div class="formula-box">
+      <div class="f-main" style="color:var(--yellow);">E = |ΔV| / Δs</div>
+      <div class="f-desc">ΔV en Volts · Δs en metros → E en V/m</div>
+    </div>
+    <div class="calc-panel" style="margin-top:14px;">
+      <div class="calc-row">
+        <label>ΔV entre equipotenciales (V):</label>
+        <input class="calc-inp" id="dv" type="number" placeholder="ej: 2" oninput="calcE()">
+      </div>
+      <div class="calc-row">
+        <label>Δs distancia perpendicular (mm):</label>
+        <input class="calc-inp" id="ds" type="number" placeholder="ej: 15" oninput="calcE()">
+      </div>
+      <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:14px;">
+        <div class="calc-result-lbl">MÓDULO DEL CAMPO ELÉCTRICO</div>
+        <div class="calc-result" id="e-result">— V/m</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Tabla de cálculo por zona</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Para cada par de equipotenciales consecutivas, calculá el campo en esa zona. Si el campo es uniforme, todos los valores deberían ser similares.</p>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Zona</th>
+          <th>V<sub>1</sub> (V)</th>
+          <th>V<sub>2</sub> (V)</th>
+          <th>ΔV (V)</th>
+          <th>Δs (mm)</th>
+          <th>E (V/m)</th>
+          <th>Dirección</th>
+        </tr>
+      </thead>
+      <tbody id="calc-body">
+        <tr>
+          <td>1–2</td>
+          <td><input class="data-table" type="number" placeholder="V1" oninput="calcRow(this,0)" style="width:65px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></td>
+          <td><input class="data-table" type="number" placeholder="V2" oninput="calcRow(this,0)" style="width:65px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></td>
+          <td id="dv0" style="color:var(--yellow);font-family:var(--mono);">—</td>
+          <td><input class="data-table" type="number" placeholder="mm" oninput="calcRow(this,0)" style="width:65px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></td>
+          <td id="e0" style="color:var(--green);font-family:var(--mono);font-weight:bold;">—</td>
+          <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">+ → −</td>
+        </tr>
+        <tr>
+          <td>2–3</td>
+          <td><input type="number" placeholder="V1" oninput="calcRow(this,1)" style="width:65px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></td>
+          <td><input type="number" placeholder="V2" oninput="calcRow(this,1)" style="width:65px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></td>
+          <td id="dv1" style="color:var(--yellow);font-family:var(--mono);">—</td>
+          <td><input type="number" placeholder="mm" oninput="calcRow(this,1)" style="width:65px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></td>
+          <td id="e1" style="color:var(--green);font-family:var(--mono);font-weight:bold;">—</td>
+          <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">+ → −</td>
+        </tr>
+        <tr>
+          <td>3–4</td>
+          <td><input type="number" placeholder="V1" oninput="calcRow(this,2)" style="width:65px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></td>
+          <td><input type="number" placeholder="V2" oninput="calcRow(this,2)" style="width:65px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></td>
+          <td id="dv2" style="color:var(--yellow);font-family:var(--mono);">—</td>
+          <td><input type="number" placeholder="mm" oninput="calcRow(this,2)" style="width:65px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></td>
+          <td id="e2" style="color:var(--green);font-family:var(--mono);font-weight:bold;">—</td>
+          <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">+ → −</td>
+        </tr>
+        <tr>
+          <td>4–5</td>
+          <td><input type="number" placeholder="V1" oninput="calcRow(this,3)" style="width:65px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></td>
+          <td><input type="number" placeholder="V2" oninput="calcRow(this,3)" style="width:65px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></td>
+          <td id="dv3" style="color:var(--yellow);font-family:var(--mono);">—</td>
+          <td><input type="number" placeholder="mm" oninput="calcRow(this,3)" style="width:65px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></td>
+          <td id="e3" style="color:var(--green);font-family:var(--mono);font-weight:bold;">—</td>
+          <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">+ → −</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Campo teórico uniforme esperado</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Para placas paralelas ideales, el campo es perfectamente uniforme. Su valor teórico se puede calcular directamente:</p>
+    <div class="formula-box">
+      <div class="f-main" style="color:var(--orange);">E<sub>teórico</sub> = V<sub>fuente</sub> / d</div>
+      <div class="f-desc">V<sub>fuente</sub> en Volts · d = distancia entre placas en metros</div>
+    </div>
+    <div class="calc-panel" style="margin-top:12px;">
+      <div class="calc-row">
+        <label>V fuente (V):</label>
+        <input class="calc-inp" id="vt" type="number" placeholder="de tus datos" oninput="calcEteo()">
+        <label style="margin-left:12px;">d entre placas (mm):</label>
+        <input class="calc-inp" id="dt" type="number" placeholder="de tus datos" oninput="calcEteo()">
+      </div>
+      <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:12px;">
+        <div class="calc-result-lbl">E TEÓRICO ESPERADO</div>
+        <div class="calc-result" id="e-teo-result" style="color:var(--orange);">— V/m</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ 6: COMPARACIÓN ══ -->
+<section class="sec" id="s6">
+  <p class="stitle">Comparación y <span>Conclusiones</span></p>
+  <p class="ssub">// Confrontar resultados empíricos con el cálculo teórico</p>
+
+  <div class="card">
+    <div class="ctitle">Cuadro comparativo</div>
+    <div class="compare-head" style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr 1fr;gap:8px;padding:0 12px;">
+      <span>Magnitud</span>
+      <span>Obtenido por</span>
+      <span>Valor</span>
+      <span>Unidad</span>
+      <span>Acuerdo</span>
+    </div>
+    <div class="compare-row">
+      <span>Potencial V (medido en zona central)</span>
+      <span><span class="badge-emp">Empírico</span></span>
+      <span><input type="text" placeholder="—" style="width:60px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></span>
+      <span style="color:var(--muted)">V</span>
+      <span>—</span>
+    </div>
+    <div class="compare-row">
+      <span>Campo E (calculado de ΔV/Δs promedio)</span>
+      <span><span class="badge-teo">Teórico</span></span>
+      <span><input type="text" placeholder="—" style="width:60px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></span>
+      <span style="color:var(--muted)">V/m</span>
+      <span id="acuerdo" style="color:var(--muted)">—</span>
+    </div>
+    <div class="compare-row">
+      <span>Campo E (fórmula teórica V/d)</span>
+      <span><span class="badge-teo">Teórico</span></span>
+      <span><input type="text" placeholder="—" style="width:60px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;text-align:center;"></span>
+      <span style="color:var(--muted)">V/m</span>
+      <span>—</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Verificación de las 4 reglas del campo</div>
+    <ul class="checklist">
+      <li onclick="toggleCheck2(0)">
+        <div class="check-icon" id="r0">—</div>
+        <div>
+          <strong style="color:var(--yellow);">Regla 1 — Sentido + → −</strong>
+          <p style="font-size:12px;color:var(--muted);">¿Las líneas que trazaste van de la placa positiva a la negativa?</p>
+        </div>
+      </li>
+      <li onclick="toggleCheck2(1)">
+        <div class="check-icon" id="r1">—</div>
+        <div>
+          <strong style="color:var(--yellow);">Regla 2 — Potencial decreciente</strong>
+          <p style="font-size:12px;color:var(--muted);">¿El voltaje disminuye en la dirección de las líneas de campo?</p>
+        </div>
+      </li>
+      <li onclick="toggleCheck2(2)">
+        <div class="check-icon" id="r2">—</div>
+        <div>
+          <strong style="color:var(--yellow);">Regla 3 — No se cruzan</strong>
+          <p style="font-size:12px;color:var(--muted);">¿Ninguna de tus líneas de campo se intersecta con otra?</p>
+        </div>
+      </li>
+      <li onclick="toggleCheck2(3)">
+        <div class="check-icon" id="r3">—</div>
+        <div>
+          <strong style="color:var(--yellow);">Regla 4 — Perpendicularidad</strong>
+          <p style="font-size:12px;color:var(--muted);">¿Las líneas de campo son perpendiculares a las equipotenciales trazadas?</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Preguntas de análisis</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="background:var(--s2);border-radius:5px;padding:14px;border-left:3px solid var(--blue);">
+        <div style="font-family:var(--head);font-size:12px;font-weight:700;letter-spacing:1px;color:var(--blue);text-transform:uppercase;margin-bottom:6px;">Pregunta 1</div>
+        <p style="font-size:13px;margin-bottom:6px;">¿Qué hubiera pasado con el campo si la distancia entre las placas fuera el doble, manteniendo la misma tensión?</p>
+        <textarea style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--body);font-size:12px;padding:8px;border-radius:4px;resize:vertical;min-height:50px;"></textarea>
+      </div>
+      <div style="background:var(--s2);border-radius:5px;padding:14px;border-left:3px solid var(--yellow);">
+        <div style="font-family:var(--head);font-size:12px;font-weight:700;letter-spacing:1px;color:var(--yellow);text-transform:uppercase;margin-bottom:6px;">Pregunta 2</div>
+        <p style="font-size:13px;margin-bottom:6px;">¿Por qué las líneas de campo no se cruzan? Explicalo con tus palabras usando el concepto de fuerza sobre una carga de prueba.</p>
+        <textarea style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--body);font-size:12px;padding:8px;border-radius:4px;resize:vertical;min-height:50px;"></textarea>
+      </div>
+      <div style="background:var(--s2);border-radius:5px;padding:14px;border-left:3px solid var(--green);">
+        <div style="font-family:var(--head);font-size:12px;font-weight:700;letter-spacing:1px;color:var(--green);text-transform:uppercase;margin-bottom:6px;">Pregunta 3</div>
+        <p style="font-size:13px;margin-bottom:6px;">¿Coinciden el valor de E calculado de tus datos con el E teórico? Si hay diferencia, ¿a qué la atribuís? ¿Qué fuentes de incertidumbre identificás?</p>
+        <textarea style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--body);font-size:12px;padding:8px;border-radius:4px;resize:vertical;min-height:50px;"></textarea>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Prof. Tgo. Alejandro Parnizari · Física 2° CT · Liceo Dr. J. Belza · v4.0 · 2026 · Asistido por Claude IA
+</footer>
+
+<script>
+// ── TABS ──
+function go(i){
+  document.querySelectorAll('.sec').forEach((s,j)=>s.classList.toggle('on',j===i));
+  document.querySelectorAll('.tb').forEach((b,j)=>b.classList.toggle('on',j===i));
+  if(i===3) drawSim();
+}
+
+// ── SIMULATOR ──
+const canvas = document.getElementById('sim-canvas');
+const ctx    = canvas.getContext('2d');
+let showField = false; // field lines disabled
+let probeX = null, probeY = null;
+
+function drawSim(){
+  const W = canvas.width, H = canvas.height;
+  const cfg     = document.getElementById('cfg').value;
+  const vSource = parseFloat(document.getElementById('voltage').value) || 9;
+
+  ctx.clearRect(0,0,W,H);
+
+  // white background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,W,H);
+
+  // light grid (mm paper feel)
+  ctx.strokeStyle = 'rgba(180,200,220,0.4)';
+  ctx.lineWidth = 0.5;
+  for(let x=0;x<W;x+=20){
+    ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();
+  }
+  for(let y=0;y<H;y+=20){
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+  }
+  // thicker lines every 100px
+  ctx.strokeStyle = 'rgba(150,180,210,0.6)';
+  ctx.lineWidth = 1;
+  for(let x=0;x<W;x+=100){
+    ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();
+  }
+  for(let y=0;y<H;y+=100){
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+  }
+
+  if(cfg==='parallel') drawParallel(W,H,vSource);
+  else if(cfg==='angled') drawAngled(W,H,vSource);
+  else drawPoint(W,H,vSource);
+
+  if(probeX!==null) drawProbe(probeX,probeY,W,H,cfg,vSource);
+}
+
+function drawParallel(W,H,V){
+  const lx=60, rx=W-60;
+  // plates
+  ctx.fillStyle='rgba(0,80,180,.7)';
+  ctx.fillRect(lx-8,20,14,H-40);
+  ctx.fillStyle='rgba(180,30,30,.7)';
+  ctx.fillRect(rx-6,20,14,H-40);
+  // + / − labels
+  ctx.font='bold 18px monospace';
+  ctx.fillStyle='#0050b4';ctx.fillText('+',lx-22,H/2+6);
+  ctx.fillStyle='#b41e1e';ctx.fillText('−',rx+14,H/2+6);
+
+  // equipotentials
+  const nEq=6;
+  for(let i=1;i<=nEq;i++){
+    const x = lx+(rx-lx)*i/(nEq+1);
+    const v = V - V*i/(nEq+1);
+    ctx.strokeStyle='rgba(0,100,200,0.5)';
+    ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
+    ctx.beginPath();ctx.moveTo(x,15);ctx.lineTo(x,H-15);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font='10px monospace';
+    ctx.fillStyle='rgba(0,80,180,0.8)';
+    ctx.fillText(v.toFixed(1)+'V',x-12,12);
+  }
+}
+
+function drawAngled(W,H,V){
+  const lx=50,rx=W-50;
+  const topL=20,botL=H-20,topR=60,botR=H-60;
+  ctx.fillStyle='rgba(0,80,180,.6)';
+  ctx.beginPath();ctx.moveTo(lx-6,topL);ctx.lineTo(lx+6,topL);ctx.lineTo(lx+6,botL);ctx.lineTo(lx-6,botL);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(180,30,30,.6)';
+  ctx.beginPath();ctx.moveTo(rx-6,topR);ctx.lineTo(rx+6,topR);ctx.lineTo(rx+6,botR);ctx.lineTo(rx-6,botR);ctx.closePath();ctx.fill();
+  ctx.font='bold 16px monospace';
+  ctx.fillStyle='#0050b4';ctx.fillText('+',lx-22,H/2+6);
+  ctx.fillStyle='#b41e1e';ctx.fillText('−',rx+10,H/2+6);
+
+  const nEq=5;
+  for(let i=1;i<=nEq;i++){
+    const t=i/(nEq+1);
+    const x1=lx+(rx-lx)*t;
+    const yTop=topL+(topR-topL)*t;
+    const yBot=botL+(botR-botL)*t;
+    const v=V-V*t;
+    ctx.strokeStyle='rgba(0,100,200,0.5)';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
+    ctx.beginPath();ctx.moveTo(x1,yTop);ctx.lineTo(x1,yBot);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font='9px monospace';ctx.fillStyle='rgba(0,80,180,0.8)';
+    ctx.fillText(v.toFixed(1)+'V',x1-10,yTop-4);
+  }
+}
+
+function drawPoint(W,H,V){
+  const cx=W/2,cy=H/2;
+  ctx.fillStyle='rgba(180,30,30,.8)';
+  ctx.beginPath();ctx.arc(cx,cy,14,0,Math.PI*2);ctx.fill();
+  ctx.font='bold 14px monospace';ctx.fillStyle='#fff';ctx.textAlign='center';
+  ctx.fillText('+',cx,cy+5);ctx.textAlign='left';
+
+  const nEq=6;
+  for(let i=1;i<=nEq;i++){
+    const r=30+i*28;
+    const v=V*Math.exp(-i*0.4);
+    ctx.strokeStyle=`rgba(0,100,200,${0.55-i*0.05})`;ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font='9px monospace';ctx.fillStyle='rgba(0,80,180,0.75)';
+    ctx.fillText(v.toFixed(1)+'V',cx+r+2,cy-2);
+  }
+}
+
+function drawProbe(px,py,W,H,cfg,V){
+  let v=0;
+  const lx=60,rx=W-60;
+  if(cfg==='parallel'){
+    const t=(px-lx)/(rx-lx);
+    v=V*(1-Math.max(0,Math.min(1,t)));
+  } else if(cfg==='point'){
+    const cx=W/2,cy=H/2;
+    const r=Math.sqrt((px-cx)**2+(py-cy)**2);
+    v=V*Math.exp(-(r-16)*0.008);
+  } else {
+    const t=(px-50)/(W-100);
+    v=V*(1-Math.max(0,Math.min(1,t)));
+  }
+
+  // probe dot
+  ctx.fillStyle='rgba(200,130,0,0.9)';
+  ctx.beginPath();ctx.arc(px,py,7,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='rgba(200,130,0,0.4)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(px,py,13,0,Math.PI*2);ctx.stroke();
+
+  // label
+  ctx.fillStyle='#fff';
+  ctx.strokeStyle='rgba(200,130,0,0.8)';ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(px+14,py-16,80,22,4) : ctx.rect(px+14,py-16,80,22);
+  ctx.fill();ctx.stroke();
+  ctx.font='bold 12px monospace';ctx.fillStyle='#7a4d00';
+  ctx.fillText(Math.max(0,v).toFixed(2)+' V',px+18,py-1);
+
+  document.getElementById('probe-val').textContent = Math.max(0,v).toFixed(2)+' V  en ('+Math.round(px)+', '+Math.round(py)+') px';
+}
+
+canvas.addEventListener('click',e=>{
+  const rect=canvas.getBoundingClientRect();
+  const scaleX=canvas.width/rect.width;
+  const scaleY=canvas.height/rect.height;
+  probeX=(e.clientX-rect.left)*scaleX;
+  probeY=(e.clientY-rect.top)*scaleY;
+  drawSim();
+});
+
+function updateSim(){probeX=null;probeY=null;drawSim();}
+function toggleField(){showField=!showField;drawSim();}
+function clearProbe(){probeX=null;probeY=null;document.getElementById('probe-val').textContent='Click para medir';drawSim();}
+
+// ── DATA TABLE ROWS ──
+let rowCount=5;
+function buildInitialRows(){
+  const body=document.getElementById('equipot-body');
+  body.innerHTML='';
+  for(let i=0;i<rowCount;i++) body.innerHTML+=makeRow(i+1);
+}
+function makeRow(n){
+  const inp=()=>`<input type="number" placeholder="—" style="width:52px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 5px;border-radius:3px;text-align:center;">`;
+  return `<tr><td style="font-family:var(--mono);color:var(--muted);">${n}</td>${Array(10).fill(inp()).join('')}</tr>`;
+}
+function addRow(){
+  rowCount++;
+  document.getElementById('equipot-body').innerHTML+=makeRow(rowCount);
+}
+function removeRow(){
+  if(rowCount<=1)return;
+  const body=document.getElementById('equipot-body');
+  if(body.lastChild)body.removeChild(body.lastChild);
+  rowCount--;
+}
+buildInitialRows();
+
+// ── CHECKLISTS ──
+const ckState={};
+function toggleCheck(i){
+  ckState[i]=!ckState[i];
+  const el=document.getElementById('ck'+i);
+  el.classList.toggle('done',ckState[i]);
+  el.closest('li').classList.toggle('done-li',ckState[i]);
+}
+const ck2State={};
+function toggleCheck2(i){
+  ck2State[i]=!ck2State[i];
+  const el=document.getElementById('r'+i);
+  el.textContent=ck2State[i]?'✓':'—';
+  el.classList.toggle('done',ck2State[i]);
+  el.closest('li').classList.toggle('done-li',ck2State[i]);
+}
+
+// ── CALCULADORA E ──
+function calcE(){
+  const dv=parseFloat(document.getElementById('dv').value);
+  const ds=parseFloat(document.getElementById('ds').value);
+  const el=document.getElementById('e-result');
+  if(isNaN(dv)||isNaN(ds)||ds===0){el.textContent='— V/m';return;}
+  const E=Math.abs(dv)/(ds/1000);
+  el.textContent=E.toFixed(1)+' V/m';
+}
+function calcEteo(){
+  const v=parseFloat(document.getElementById('vt').value);
+  const d=parseFloat(document.getElementById('dt').value);
+  const el=document.getElementById('e-teo-result');
+  if(isNaN(v)||isNaN(d)||d===0){el.textContent='— V/m';return;}
+  el.textContent=(v/(d/1000)).toFixed(1)+' V/m';
+}
+
+// ── ROW CALCS ──
+function calcRow(inp,idx){
+  const row=inp.closest('tr');
+  const nums=[...row.querySelectorAll('input')].map(i=>parseFloat(i.value));
+  const v1=nums[0],v2=nums[1],ds=nums[2];
+  if(!isNaN(v1)&&!isNaN(v2)){
+    document.getElementById('dv'+idx).textContent=Math.abs(v1-v2).toFixed(2)+' V';
+  }
+  if(!isNaN(v1)&&!isNaN(v2)&&!isNaN(ds)&&ds>0){
+    const E=Math.abs(v1-v2)/(ds/1000);
+    document.getElementById('e'+idx).textContent=E.toFixed(1)+' V/m';
+  }
+}
+</script>
+</body>
+</html>
