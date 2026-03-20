@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Problemas — Campo Eléctrico</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080c12;--s1:#0e1520;--s2:#141e2e;--border:#1e3050;
+  --blue:#00e5ff;--yellow:#ffe066;--red:#ff4d6d;--green:#39ff8a;--orange:#ff9f1c;
+  --text:#cdd8e8;--muted:#506080;
+  --mono:'Share Tech Mono',monospace;--head:'Rajdhani',sans-serif;--body:'Barlow',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--body);font-size:15px;line-height:1.6;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,.02) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,.02) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;
+}
+
+header{
+  position:relative;z-index:10;
+  background:linear-gradient(135deg,#05111e,#091826);
+  border-bottom:2px solid var(--blue);
+  padding:18px 28px;display:flex;align-items:center;gap:16px;
+}
+.hdr-icon{font-size:34px;filter:drop-shadow(0 0 8px var(--blue));}
+.hdr-text h1{font-family:var(--head);font-size:20px;font-weight:700;letter-spacing:1px;color:#fff;text-transform:uppercase;}
+.hdr-text p{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--blue);text-transform:uppercase;margin-top:2px;}
+.hdr-score{
+  margin-left:auto;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:6px;padding:8px 16px;text-align:center;
+  font-family:var(--mono);
+}
+.hdr-score .sc-val{font-size:28px;color:var(--yellow);line-height:1;}
+.hdr-score .sc-lbl{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;}
+
+main{
+  position:relative;z-index:5;
+  max-width:860px;margin:0 auto;
+  padding:28px 20px 80px;
+}
+
+/* progress */
+.progress-bar{
+  width:100%;height:6px;background:var(--s2);border-radius:3px;margin-bottom:24px;
+  overflow:hidden;
+}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:3px;transition:width .4s ease;}
+
+/* question card */
+.q-card{
+  background:var(--s1);border:1px solid var(--border);border-radius:8px;
+  padding:24px;margin-bottom:20px;
+  transition:border-color .2s;
+  display:none;
+}
+.q-card.active{display:block;animation:fi .25s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.q-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;}
+.q-num{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--head);font-size:15px;font-weight:700;
+  background:var(--blue);color:#000;
+}
+.q-type-badge{
+  display:inline-block;
+  font-family:var(--head);font-size:9px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  padding:3px 8px;border-radius:3px;margin-bottom:4px;
+}
+.badge-tf{background:rgba(0,229,255,.15);color:var(--blue);border:1px solid rgba(0,229,255,.3);}
+.badge-mc{background:rgba(255,224,102,.15);color:var(--yellow);border:1px solid rgba(255,224,102,.3);}
+.badge-num{background:rgba(57,255,138,.15);color:var(--green);border:1px solid rgba(57,255,138,.3);}
+.badge-draw{background:rgba(255,159,28,.15);color:var(--orange);border:1px solid rgba(255,159,28,.3);}
+
+.q-text{font-size:15px;line-height:1.7;color:var(--text);}
+.q-text strong{color:var(--yellow);}
+.q-sub{font-size:13px;color:var(--muted);margin-top:6px;font-style:italic;}
+
+/* difficulty stars */
+.diff{font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;}
+
+/* options */
+.options{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
+.opt-btn{
+  display:flex;align-items:center;gap:12px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:6px;padding:11px 16px;
+  cursor:pointer;text-align:left;
+  font-family:var(--body);font-size:14px;color:var(--text);
+  transition:all .15s;width:100%;
+}
+.opt-btn:hover:not(:disabled){border-color:var(--blue);background:rgba(0,229,255,.05);}
+.opt-btn:disabled{cursor:default;}
+.opt-letter{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--head);font-size:13px;font-weight:700;
+  background:var(--border);color:var(--muted);
+  transition:all .15s;
+}
+.opt-btn.correct{border-color:var(--green);background:rgba(57,255,138,.08);}
+.opt-btn.correct .opt-letter{background:var(--green);color:#000;}
+.opt-btn.wrong{border-color:var(--red);background:rgba(255,77,109,.08);}
+.opt-btn.wrong .opt-letter{background:var(--red);color:#fff;}
+.opt-btn.neutral-show{border-color:rgba(57,255,138,.3);opacity:.6;}
+
+/* TF buttons */
+.tf-row{display:flex;gap:10px;margin-top:16px;}
+.tf-btn{
+  flex:1;padding:12px;border-radius:6px;border:1px solid var(--border);
+  background:var(--s2);cursor:pointer;
+  font-family:var(--head);font-size:15px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;color:var(--text);
+  transition:all .15s;
+}
+.tf-btn:hover:not(:disabled){border-color:var(--blue);}
+.tf-btn:disabled{cursor:default;}
+.tf-btn.correct{border-color:var(--green);background:rgba(57,255,138,.12);color:var(--green);}
+.tf-btn.wrong{border-color:var(--red);background:rgba(255,77,109,.12);color:var(--red);}
+.tf-btn.neutral-show{border-color:rgba(57,255,138,.3);opacity:.5;}
+
+/* numeric */
+.num-row{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap;}
+.num-inp{
+  background:var(--s2);border:2px solid var(--border);
+  border-radius:6px;color:var(--text);font-family:var(--mono);font-size:16px;
+  padding:9px 14px;width:160px;transition:border-color .2s;
+}
+.num-inp:focus{outline:none;border-color:var(--blue);}
+.num-inp.correct-inp{border-color:var(--green);}
+.num-inp.wrong-inp{border-color:var(--red);}
+.num-unit{font-family:var(--mono);font-size:13px;color:var(--muted);}
+.num-hint{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.5px;}
+.check-btn{
+  background:var(--blue);color:#000;
+  font-family:var(--head);font-size:13px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;
+  border:none;padding:10px 20px;border-radius:6px;
+  cursor:pointer;transition:all .15s;
+}
+.check-btn:hover{background:#00b8cc;}
+.check-btn:disabled{background:var(--border);color:var(--muted);cursor:default;}
+
+/* feedback */
+.feedback{
+  margin-top:14px;border-radius:6px;padding:14px 16px;
+  font-size:13px;line-height:1.7;display:none;
+}
+.feedback.show{display:block;animation:fi .2s ease;}
+.fb-correct{background:rgba(57,255,138,.1);border:1px solid rgba(57,255,138,.35);color:#90f5b8;}
+.fb-wrong{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.35);color:#f5a0b0;}
+.fb-icon{font-size:16px;margin-right:6px;}
+.fb-title{font-family:var(--head);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+
+/* nav buttons */
+.q-nav{display:flex;justify-content:flex-end;margin-top:16px;gap:10px;}
+.nav-btn{
+  font-family:var(--head);font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  padding:9px 22px;border-radius:5px;border:none;cursor:pointer;transition:all .15s;
+}
+.nav-next{background:var(--blue);color:#000;}
+.nav-next:hover{background:#00b8cc;}
+.nav-next:disabled{background:var(--border);color:var(--muted);cursor:default;}
+
+/* summary */
+#summary{display:none;animation:fi .3s ease;}
+.summary-card{
+  background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:30px;text-align:center;
+}
+.sum-title{font-family:var(--head);font-size:32px;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase;}
+.sum-score{font-size:72px;font-family:var(--mono);color:var(--yellow);line-height:1;margin:16px 0;text-shadow:0 0 20px rgba(255,224,102,.3);}
+.sum-sub{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:1px;}
+.sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0;}
+.sum-cell{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:16px;text-align:center;}
+.sum-cell .sv{font-size:28px;font-family:var(--mono);margin-bottom:4px;}
+.sum-cell .sl{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-family:var(--head);}
+.restart-btn{
+  background:var(--blue);color:#000;
+  font-family:var(--head);font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  border:none;padding:13px 36px;border-radius:6px;cursor:pointer;margin-top:16px;
+  transition:background .15s;
+}
+.restart-btn:hover{background:#00b8cc;}
+
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+footer{
+  position:relative;z-index:5;text-align:center;padding:16px;
+  font-family:var(--mono);font-size:9px;color:var(--muted);
+  border-top:1px solid var(--border);letter-spacing:1.5px;text-transform:uppercase;
+}
+@media(max-width:600px){.sum-grid{grid-template-columns:1fr 1fr;}.tf-row{flex-direction:column;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-icon">⚡</div>
+  <div class="hdr-text">
+    <h1>Campo Eléctrico — Actividades</h1>
+    <p>Verdadero/Falso · Opción Múltiple · Respuesta Numérica</p>
+  </div>
+  <div class="hdr-score">
+    <div class="sc-val" id="score-display">0</div>
+    <div class="sc-lbl">puntos</div>
+  </div>
+</header>
+
+<main>
+  <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+
+  <div id="quiz-area"></div>
+
+  <div id="summary">
+    <div class="summary-card">
+      <div class="sum-title">¡Actividad completada!</div>
+      <div class="sum-score" id="final-score">0</div>
+      <div class="sum-sub">PUNTOS OBTENIDOS</div>
+      <div class="sum-grid">
+        <div class="sum-cell"><div class="sv" id="s-correct" style="color:var(--green)">0</div><div class="sl">Correctas</div></div>
+        <div class="sum-cell"><div class="sv" id="s-wrong" style="color:var(--red)">0</div><div class="sl">Incorrectas</div></div>
+        <div class="sum-cell"><div class="sv" id="s-pct" style="color:var(--yellow)">0%</div><div class="sl">Rendimiento</div></div>
+      </div>
+      <div id="sum-msg" style="font-size:14px;color:var(--muted);margin-bottom:8px;"></div>
+      <button class="restart-btn" onclick="restart()">⟳ Volver a intentar</button>
+    </div>
+  </div>
+</main>
+
+<footer>Prof. Tgo. Alejandro Parnizari · Física 2° CT · Liceo Dr. J. Belza · Campo Eléctrico · 2026</footer>
+
+<script>
+// ═══════════════════════════════════
+//  QUESTION DATA
+// ═══════════════════════════════════
+const QUESTIONS = [
+
+  // ── VERDADERO / FALSO ──
+  {
+    id:1, type:'tf', diff:1,
+    text:'Si se invirtiesen los signos de la carga del electrón y del protón, el mundo macroscópico se vería <strong>exactamente igual</strong> que ahora.',
+    correct: true,
+    fb_correct:'✓ Correcto. Los fenómenos electromagnéticos dependen del producto de cargas (qq\'). Invertir simultáneamente todos los signos no altera ninguna fuerza ni interacción observable. El universo macroscópico sería indistinguible.',
+    fb_wrong:'Pensalo de nuevo. La fuerza de Coulomb depende del producto q₁·q₂. Si ambas cargas cambian de signo, el producto no cambia. Todos los átomos, moléculas y materiales seguirían comportándose exactamente igual.'
+  },
+  {
+    id:2, type:'tf', diff:1,
+    text:'Una pompa de jabón cargada eléctricamente <strong>aumenta</strong> su diámetro respecto a una sin carga.',
+    correct: true,
+    fb_correct:'✓ Correcto. Las cargas del mismo signo que se distribuyen en la superficie se repelen entre sí, generando una presión electrostática adicional hacia afuera que se suma a la presión del aire interior. El resultado es un mayor diámetro de equilibrio.',
+    fb_wrong:'La respuesta es Verdadero. Al cargar la pompa, las cargas iguales distribuidas en la superficie se repelen → presión electrostática hacia afuera → diámetro mayor. Es el mismo principio que un globo al que se le agrega más aire.'
+  },
+  {
+    id:3, type:'tf', diff:1,
+    text:'El campo eléctrico E⃗ en un punto desaparece si se retira la carga de prueba q₀ que se usó para detectarlo.',
+    correct: false,
+    fb_correct:'✓ Correcto. El campo eléctrico es una propiedad del espacio creada por las cargas fuente, no por la carga de prueba. La carga de prueba solo sirve para "revelar" el campo existente; su presencia o ausencia no lo modifica (siempre que q₀ sea lo suficientemente pequeña como para no perturbar la distribución de cargas fuente).',
+    fb_wrong:'Es Falso. El campo E⃗ existe independientemente de si hay una carga de prueba o no. Las cargas fuente (placas, cargas puntuales, etc.) son las que crean el campo. Retirar q₀ no lo elimina: el campo sigue ahí, esperando actuar sobre cualquier carga que coloquemos.'
+  },
+  {
+    id:4, type:'tf', diff:2,
+    text:'Un cuerpo puede tener una carga eléctrica de <strong>2,4×10⁻¹⁹ C</strong>.',
+    correct: false,
+    fb_correct:'✓ Correcto: es Falso. La carga del electrón es e = 1,6×10⁻¹⁹ C. Toda carga eléctrica debe ser múltiplo entero de e. 2,4×10⁻¹⁹ / 1,6×10⁻¹⁹ = 1,5 — no es entero, por lo que esa carga viola la cuantización de la carga eléctrica.',
+    fb_wrong:'Revisá el principio de cuantización. La carga eléctrica está cuantizada: q = n·e, donde e = 1,6×10⁻¹⁹ C y n es entero. 2,4×10⁻¹⁹ / 1,6×10⁻¹⁹ = 1,5 — no es entero → esa carga es imposible. En cambio 3,2×10⁻¹⁹ / 1,6×10⁻¹⁹ = 2 → sí es posible (n=2).'
+  },
+  {
+    id:5, type:'tf', diff:2,
+    text:'Las líneas de campo eléctrico pueden cruzarse en un punto del espacio si las cargas fuente son suficientemente intensas.',
+    correct: false,
+    fb_correct:'✓ Correcto: Falso. En un punto de cruce existirían dos direcciones distintas del campo simultáneamente, lo que implicaría que una carga de prueba experimentaría dos fuerzas en distintas direcciones al mismo tiempo. Eso es físicamente imposible: el campo solo puede tener una dirección en cada punto.',
+    fb_wrong:'Es Falso, sin importar la intensidad de las cargas. El campo eléctrico es una función vectorial unívoca del espacio: en cada punto solo puede existir un único vector E⃗. Si dos líneas se cruzaran, ese punto tendría dos vectores campo, lo que violaría la definición misma de campo eléctrico.'
+  },
+  {
+    id:6, type:'tf', diff:1,
+    text:'Moverse a lo largo de una superficie equipotencial requiere trabajo por parte del campo eléctrico.',
+    correct: false,
+    fb_correct:'✓ Correcto: Falso. Por definición, todos los puntos de una equipotencial tienen el mismo potencial V. El trabajo realizado por el campo es T = q·(V_A − V_B). Si V_A = V_B → T = 0. No se realiza trabajo.',
+    fb_wrong:'Es Falso. La definición de equipotencial implica ΔV = 0 entre cualquier par de puntos sobre ella. Como T = q·ΔV = 0, el campo no realiza trabajo en ese desplazamiento. Por eso las equipotenciales son perpendiculares al campo: si fueran paralelas, el campo realizaría trabajo a lo largo de ellas.'
+  },
+
+  // ── OPCIÓN MÚLTIPLE ──
+  {
+    id:7, type:'mc', diff:2,
+    text:'Un péndulo cargado se acerca a uno descargado: se atraen y se adhieren. Poco después se repelen. La explicación correcta es:',
+    options:[
+      'El contacto generó calor que cargó el segundo péndulo con el mismo signo.',
+      'Al contacto, las cargas se distribuyeron entre ambos péndulos. Ambos quedan con carga del mismo signo → repulsión.',
+      'El campo eléctrico del primero polarizó permanentemente al segundo.',
+      'La atracción inicial fue gravitatoria, no eléctrica.'
+    ],
+    correct:1,
+    fb:[
+      'Incorrecto. El calor no transfiere carga eléctrica de esa manera. La transferencia de carga ocurre por contacto directo entre conductores.',
+      '✓ Correcto. Al tocarse, las cargas del péndulo cargado se redistribuyen entre ambos (conducción). Ambos quedan con carga del mismo signo → se repelen. Es el principio de carga por contacto.',
+      'Incorrecto. La polarización es un efecto temporal que desaparece al alejar la carga. No produce repulsión permanente ni requiere contacto.',
+      'Incorrecto. La fuerza gravitatoria entre dos péndulos pequeños es despreciable comparada con la fuerza eléctrica. La atracción inicial se debe a la inducción electrostática (el péndulo descargado se polariza antes del contacto).'
+    ]
+  },
+  {
+    id:8, type:'mc', diff:2,
+    text:'¿Cuántos protones conforman 1 coulomb de carga? (carga del protón: e = 1,6×10⁻¹⁹ C)',
+    options:[
+      '1,6×10⁻¹⁹ protones',
+      '1,6×10¹⁹ protones',
+      '6,25×10¹⁸ protones',
+      '6,25×10⁻¹⁹ protones'
+    ],
+    correct:2,
+    fb:[
+      'Incorrecto. 1,6×10⁻¹⁹ es la carga de un solo protón, no la cantidad de protones en 1 C.',
+      'Incorrecto. Confundiste el cálculo. n = Q/e = 1 / 1,6×10⁻¹⁹. Revisá la división.',
+      '✓ Correcto. n = Q/e = 1 C / 1,6×10⁻¹⁹ C = 6,25×10¹⁸ protones. Es una cantidad enorme — por eso el coulomb es una unidad muy grande en la práctica.',
+      'Incorrecto. El exponente negativo daría una fracción de protón, lo que no tiene sentido físico.'
+    ]
+  },
+  {
+    id:9, type:'mc', diff:2,
+    text:'Un protón se mueve en la misma dirección que el campo E = 200 N/C. La fuerza eléctrica que actúa sobre él es:',
+    options:[
+      '200 N, en sentido contrario al movimiento.',
+      '3,2×10⁻¹⁷ N, en el mismo sentido que E⃗.',
+      '3,2×10⁻¹⁷ N, en sentido contrario a E⃗.',
+      '1,6×10⁻¹⁹ N, en el mismo sentido que E⃗.'
+    ],
+    correct:1,
+    fb:[
+      'Incorrecto. La magnitud 200 N confunde el campo (N/C) con la fuerza. F = qE = 1,6×10⁻¹⁹ C × 200 N/C = 3,2×10⁻¹⁷ N.',
+      '✓ Correcto. F = qE = 1,6×10⁻¹⁹ C × 200 N/C = 3,2×10⁻¹⁷ N. Como el protón tiene carga positiva, la fuerza tiene el mismo sentido que E⃗.',
+      'Incorrecto. La fuerza sobre una carga positiva es en el mismo sentido que E⃗, no en sentido contrario (eso sería para una carga negativa).',
+      'Incorrecto. 1,6×10⁻¹⁹ N sería el resultado de usar la carga sin multiplicarla por E. F = q·E, no solo q.'
+    ]
+  },
+  {
+    id:10, type:'mc', diff:2,
+    text:'En la superficie terrestre existe un campo eléctrico de ~100 N/C apuntando hacia abajo. Para que una partícula de masa 4,0 g levite (equilibrio), su carga debe ser:',
+    options:[
+      'q = 4,0×10⁻⁴ C negativa (fuerza eléctrica hacia arriba).',
+      'q = 4,0×10⁻⁴ C positiva (fuerza eléctrica hacia arriba).',
+      'q = 3,92×10⁻⁴ C negativa.',
+      'q = 0,4 C positiva.'
+    ],
+    correct:2,
+    fb:[
+      'Casi correcto en el signo, pero el valor no considera g correctamente. Equilibrio: qE = mg → q = mg/E = (0,004 × 9,8) / 100 = 3,92×10⁻⁴ C. Como E apunta hacia abajo, para que la fuerza sea hacia arriba la carga debe ser negativa.',
+      'El signo es incorrecto. Si E apunta hacia abajo y la carga es positiva, F = qE apunta hacia abajo también → no hay levitación.',
+      '✓ Correcto. q = mg/E = (4,0×10⁻³ kg × 9,8 m/s²) / 100 N/C = 3,92×10⁻⁴ C. Negativa porque el campo apunta hacia abajo y necesitamos fuerza hacia arriba.',
+      'Incorrecto. 0,4 C es un valor enorme. El cálculo correcto da ~10⁻⁴ C. Verificá las unidades: masa en kg, g en m/s².'
+    ]
+  },
+  {
+    id:11, type:'mc', diff:3,
+    text:'El campo eléctrico se define como E⃗ = F⃗/q₀. ¿Qué magnitudes son vectoriales y cuáles escalares?',
+    options:[
+      'E⃗ vectorial, F⃗ vectorial, q₀ escalar. → Correcto.',
+      'E⃗ escalar, F⃗ vectorial, q₀ escalar.',
+      'E⃗ vectorial, F⃗ escalar, q₀ vectorial.',
+      'Todas son vectoriales.'
+    ],
+    correct:0,
+    fb:[
+      '✓ Correcto. E⃗ es un vector (tiene módulo, dirección y sentido). F⃗ es la fuerza, también vectorial. q₀ es la carga, una magnitud escalar. Dividir un vector por un escalar da otro vector en la misma dirección.',
+      'Incorrecto. E⃗ es vectorial: en cada punto del espacio tiene una dirección y sentido definidos. Si fuera escalar no podríamos hablar de "dirección del campo".',
+      'Incorrecto. La fuerza F⃗ es una magnitud vectorial (tiene dirección y sentido). La carga q₀ es escalar: no tiene "dirección".',
+      'Incorrecto. La carga eléctrica q₀ es una magnitud escalar. Solo tiene un valor numérico (positivo o negativo) pero no una dirección en el espacio.'
+    ]
+  },
+  {
+    id:12, type:'mc', diff:3,
+    text:'Se triplicó la carga de la partícula del problema de levitación (problema 9 del PDF). La partícula con esa nueva carga, partiendo del reposo, realiza un movimiento:',
+    options:[
+      'Uniforme hacia arriba, porque la fuerza neta es constante.',
+      'Uniformemente acelerado hacia arriba, porque la fuerza neta resultante es constante y hacia arriba.',
+      'Desacelerado, porque la gravedad la frena.',
+      'Oscilatorio, porque las fuerzas se alternan.'
+    ],
+    correct:1,
+    fb:[
+      'Incorrecto. Movimiento uniforme requeriría fuerza neta = 0. Aquí la fuerza eléctrica (3q·E) supera al peso (mg), por lo que hay fuerza neta → hay aceleración → no es uniforme.',
+      '✓ Correcto. Con q\' = 3q: F_elec = 3qE = 3 × 3,92×10⁻⁴ × 100 = 0,1176 N hacia arriba. Peso = mg = 0,0392 N hacia abajo. F_neta = 0,0784 N hacia arriba = constante. Campo y masa no varían → aceleración constante → MRUA hacia arriba.',
+      'Incorrecto. La partícula asciende porque la fuerza eléctrica (hacia arriba) supera al peso. No hay desaceleración: el movimiento es acelerado hacia arriba.',
+      'Incorrecto. No hay ningún mecanismo que invierta las fuerzas. El campo eléctrico terrestre es aproximadamente constante en esa escala, por lo que la fuerza neta es constante y el movimiento es rectilíneo acelerado.'
+    ]
+  },
+
+  // ── NUMÉRICA ──
+  {
+    id:13, type:'num', diff:2,
+    text:'Un protón se mueve con una velocidad inicial de 3,0×10⁴ m/s en la dirección del campo E = 200 N/C. <strong>¿Cuál es la aceleración del protón?</strong>',
+    hint:'a = F/m = qE/m · masa del protón: 1,67×10⁻²⁷ kg',
+    unit:'m/s²',
+    answer: 1.92e10,   // 3.2e-17 / 1.67e-27 ≈ 1.916e10
+    tol: 0.02,
+    fb_correct:'✓ Correcto. F = qE = 1,6×10⁻¹⁹ × 200 = 3,2×10⁻¹⁷ N. a = F/m = 3,2×10⁻¹⁷ / 1,67×10⁻²⁷ ≈ 1,92×10¹⁰ m/s². Es una aceleración enorme comparada con g = 9,8 m/s².',
+    fb_wrong:'Revisá el procedimiento: F = qE = 1,6×10⁻¹⁹ C × 200 N/C = 3,2×10⁻¹⁷ N. Luego a = F/m_protón = 3,2×10⁻¹⁷ N / 1,67×10⁻²⁷ kg ≈ 1,92×10¹⁰ m/s².'
+  },
+  {
+    id:14, type:'num', diff:2,
+    text:'El mismo protón del problema anterior recorre <strong>20 cm</strong> dentro del campo. ¿Cuál es su velocidad final? (v₀ = 3,0×10⁴ m/s, a ≈ 1,92×10¹⁰ m/s², Δx = 0,20 m)',
+    hint:'Usá: v² = v₀² + 2·a·Δx → v = √(v₀² + 2aΔx)',
+    unit:'m/s',
+    answer: 8.77e4,   // sqrt((3e4)^2 + 2*1.916e10*0.2) = sqrt(9e8 + 7.664e9) = sqrt(8.564e9) ≈ 9.25e4
+    tol: 0.05,
+    fb_correct:'✓ Correcto. v² = (3,0×10⁴)² + 2 × 1,92×10¹⁰ × 0,20 = 9×10⁸ + 7,68×10⁹ = 8,58×10⁹. v = √(8,58×10⁹) ≈ 9,26×10⁴ m/s. Notar que el campo aceleró significativamente al protón.',
+    fb_wrong:'Aplicá la cinemática: v² = v₀² + 2·a·Δx. v₀ = 3,0×10⁴ m/s, a = 1,92×10¹⁰ m/s², Δx = 0,20 m. v² = 9×10⁸ + 7,68×10⁹ = 8,58×10⁹. v ≈ 9,26×10⁴ m/s.'
+  },
+  {
+    id:15, type:'num', diff:2,
+    text:'Un electrón parte del reposo y adquiere una velocidad de <strong>1,5×10⁴ m/s</strong> en <strong>0,30 s</strong>. ¿Cuál es el módulo del campo eléctrico que lo aceleró? (masa del electrón: 9,11×10⁻³¹ kg, carga: 1,6×10⁻¹⁹ C)',
+    hint:'a = Δv/Δt · F = ma · E = F/q',
+    unit:'N/C',
+    answer: 2.84e-7,  // a=5e4, F=9.11e-31*5e4=4.555e-26, E=4.555e-26/1.6e-19=2.85e-7
+    tol: 0.03,
+    fb_correct:'✓ Correcto. a = 1,5×10⁴/0,30 = 5,0×10⁴ m/s². F = m·a = 9,11×10⁻³¹ × 5,0×10⁴ = 4,56×10⁻²⁶ N. E = F/q = 4,56×10⁻²⁶ / 1,6×10⁻¹⁹ ≈ 2,85×10⁻⁷ N/C. Es un campo muy débil — el electrón es muy liviano.',
+    fb_wrong:'Paso a paso: 1) a = Δv/Δt = 1,5×10⁴/0,30 = 5,0×10⁴ m/s². 2) F = m·a = 9,11×10⁻³¹ × 5,0×10⁴ = 4,56×10⁻²⁶ N. 3) E = F/q = 4,56×10⁻²⁶ / 1,6×10⁻¹⁹ ≈ 2,85×10⁻⁷ N/C.'
+  },
+  {
+    id:16, type:'num', diff:3,
+    text:'La partícula cargada con <strong>q\' = 3q = 3 × 3,92×10⁻⁴ C</strong> parte del reposo en el campo terrestre E = 100 N/C (↓) y su propio peso (m = 4,0×10⁻³ kg). ¿Cuál es su velocidad al haber ascendido <strong>5,0 m</strong>?',
+    hint:'F_neta = q\'E − mg (hacia arriba) · a = F_neta/m · v² = 2aΔy',
+    unit:'m/s',
+    answer: 19.8,   // F=3*3.92e-4*100=0.1176, mg=0.004*9.8=0.0392, Fnet=0.0784, a=0.0784/0.004=19.6, v=sqrt(2*19.6*5)=sqrt(196)=14
+    tol: 0.04,
+    fb_correct:'✓ Correcto. F_elec = 3 × 3,92×10⁻⁴ × 100 = 0,1176 N (↑). Peso = 4,0×10⁻³ × 9,8 = 0,0392 N (↓). F_neta = 0,0784 N (↑). a = 0,0784/4,0×10⁻³ = 19,6 m/s². v = √(2×19,6×5,0) = √196 ≈ 14,0 m/s.',
+    fb_wrong:'1) F_elec = q\'·E = 1,176×10⁻³ C × 100 N/C = 0,1176 N hacia arriba. 2) Peso = mg = 0,004 × 9,8 = 0,0392 N hacia abajo. 3) F_neta = 0,1176 − 0,0392 = 0,0784 N. 4) a = F/m = 0,0784/0,004 = 19,6 m/s². 5) v = √(2·a·Δy) = √(2×19,6×5) = √196 = 14,0 m/s.'
+  },
+  {
+    id:17, type:'num', diff:1,
+    text:'¿Cuántos protones conforman exactamente <strong>1 coulomb</strong> de carga? Expresá el resultado en notación científica con 3 cifras significativas. (e = 1,60×10⁻¹⁹ C) — ingresá el coeficiente × 10¹⁸ (ej: si la respuesta es 6,25×10¹⁸ ingresá 6.25)',
+    hint:'n = Q/e = 1 / 1,60×10⁻¹⁹  →  ingresá el número × 10¹⁸',
+    unit:'× 10¹⁸ protones',
+    answer: 6.25,
+    tol: 0.02,
+    fb_correct:'✓ Correcto. n = 1 C / 1,60×10⁻¹⁹ C = 6,25×10¹⁸ protones. ¡Es una cantidad astronómica! Un coulomb es una unidad enorme de carga: en la práctica se trabaja con microcoulombs (μC) o nanocoulombs (nC).',
+    fb_wrong:'n = Q/e = 1 / 1,60×10⁻¹⁹ = 6,25×10¹⁸. Expresado como coeficiente ×10¹⁸ es 6.25.'
+  },
+];
+
+// ═══════════════════════════════════
+//  STATE
+// ═══════════════════════════════════
+let current = 0;
+let score = 0;
+let correct = 0;
+let wrong = 0;
+let answered = new Array(QUESTIONS.length).fill(false);
+
+// ═══════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════
+function render(){
+  const area = document.getElementById('quiz-area');
+  area.innerHTML = '';
+  QUESTIONS.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'q-card' + (i === current ? ' active' : '');
+    div.id = 'qcard'+i;
+    div.innerHTML = buildCard(q, i);
+    area.appendChild(div);
+  });
+  updateProgress();
+}
+
+function buildCard(q, idx){
+  const stars = '★'.repeat(q.diff) + '☆'.repeat(3-q.diff);
+  const typeLbl = {tf:'Verdadero / Falso', mc:'Opción Múltiple', num:'Respuesta Numérica'}[q.type];
+  const badgeCls = {tf:'badge-tf', mc:'badge-mc', num:'badge-num'}[q.type];
+
+  let body = '';
+  if(q.type === 'tf'){
+    body = `
+      <div class="tf-row">
+        <button class="tf-btn" id="tf-t-${idx}" onclick="answerTF(${idx},true)">✓ Verdadero</button>
+        <button class="tf-btn" id="tf-f-${idx}" onclick="answerTF(${idx},false)">✗ Falso</button>
+      </div>`;
+  } else if(q.type === 'mc'){
+    body = '<div class="options">';
+    q.options.forEach((opt,oi)=>{
+      const letter = String.fromCharCode(65+oi);
+      body += `<button class="opt-btn" id="opt-${idx}-${oi}" onclick="answerMC(${idx},${oi})">
+        <div class="opt-letter">${letter}</div>
+        <span>${opt}</span>
+      </button>`;
+    });
+    body += '</div>';
+  } else if(q.type === 'num'){
+    body = `
+      <p class="num-hint">💡 Pista: ${q.hint}</p>
+      <div class="num-row">
+        <input class="num-inp" id="num-inp-${idx}" type="text" placeholder="ej: 1.92e10" onkeydown="if(event.key==='Enter')checkNum(${idx})">
+        <span class="num-unit">${q.unit}</span>
+        <button class="check-btn" id="check-btn-${idx}" onclick="checkNum(${idx})">Verificar</button>
+      </div>`;
+  }
+
+  const navDisabled = answered[idx] ? '' : 'disabled';
+
+  return `
+    <div class="q-header">
+      <div class="q-num">${idx+1}</div>
+      <div style="flex:1;">
+        <div><span class="q-type-badge ${badgeCls}">${typeLbl}</span></div>
+        <p class="q-text">${q.text}</p>
+      </div>
+      <div class="diff" title="Dificultad">${stars}</div>
+    </div>
+    ${body}
+    <div class="feedback" id="fb-${idx}"></div>
+    <div class="q-nav">
+      <button class="nav-btn nav-next" id="next-${idx}" ${navDisabled} onclick="nextQ(${idx})">
+        ${idx < QUESTIONS.length-1 ? 'Siguiente →' : 'Ver resultados'}
+      </button>
+    </div>`;
+}
+
+// ═══════════════════════════════════
+//  ANSWER HANDLERS
+// ═══════════════════════════════════
+function answerTF(idx, val){
+  if(answered[idx]) return;
+  answered[idx] = true;
+  const q = QUESTIONS[idx];
+  const isOk = (val === q.correct);
+  if(isOk){ score += pointsFor(q); correct++; }
+  else { wrong++; }
+  updateScore();
+
+  // style buttons
+  const btnT = document.getElementById('tf-t-'+idx);
+  const btnF = document.getElementById('tf-f-'+idx);
+  btnT.disabled = true; btnF.disabled = true;
+
+  if(q.correct === true){
+    btnT.classList.add(isOk ? 'correct' : 'neutral-show');
+    if(!isOk) btnF.classList.add('wrong');
+  } else {
+    btnF.classList.add(isOk ? 'correct' : 'neutral-show');
+    if(!isOk) btnT.classList.add('wrong');
+  }
+
+  showFeedback(idx, isOk, isOk ? q.fb_correct : q.fb_wrong);
+  unlockNext(idx);
+}
+
+function answerMC(idx, choice){
+  if(answered[idx]) return;
+  answered[idx] = true;
+  const q = QUESTIONS[idx];
+  const isOk = (choice === q.correct);
+  if(isOk){ score += pointsFor(q); correct++; }
+  else { wrong++; }
+  updateScore();
+
+  // style all buttons
+  q.options.forEach((_,oi)=>{
+    const btn = document.getElementById('opt-'+idx+'-'+oi);
+    btn.disabled = true;
+    if(oi === q.correct) btn.classList.add('correct');
+    else if(oi === choice && !isOk) btn.classList.add('wrong');
+    else btn.classList.add('neutral-show');
+  });
+
+  showFeedback(idx, isOk, q.fb[choice]);
+  unlockNext(idx);
+}
+
+function checkNum(idx){
+  if(answered[idx]) return;
+  const q = QUESTIONS[idx];
+  const inp = document.getElementById('num-inp-'+idx);
+  const raw = inp.value.trim().replace(',','.');
+  const val = parseFloat(raw);
+  if(isNaN(val)){ inp.classList.add('wrong-inp'); showFeedback(idx,false,'⚠ Ingresá un número válido. Usá notación como: 1.92e10 o 19200000000'); return; }
+
+  const isOk = Math.abs((val - q.answer)/q.answer) <= q.tol;
+  answered[idx] = true;
+  if(isOk){ score += pointsFor(q); correct++; inp.classList.add('correct-inp'); }
+  else { wrong++; inp.classList.add('wrong-inp'); }
+  inp.disabled = true;
+  document.getElementById('check-btn-'+idx).disabled = true;
+  updateScore();
+  showFeedback(idx, isOk, isOk ? q.fb_correct : q.fb_wrong);
+  unlockNext(idx);
+}
+
+function pointsFor(q){ return {1:1, 2:2, 3:3}[q.diff]; }
+
+// ═══════════════════════════════════
+//  FEEDBACK
+// ═══════════════════════════════════
+function showFeedback(idx, isOk, text){
+  const fb = document.getElementById('fb-'+idx);
+  fb.className = 'feedback show ' + (isOk ? 'fb-correct' : 'fb-wrong');
+  const icon = isOk ? '✅' : '❌';
+  fb.innerHTML = `<span class="fb-icon">${icon}</span><strong>${isOk?'Correcto':'Incorrecto'}</strong><br>${text}`;
+}
+
+// ═══════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════
+function unlockNext(idx){
+  const btn = document.getElementById('next-'+idx);
+  if(btn) btn.disabled = false;
+}
+
+function nextQ(idx){
+  document.getElementById('qcard'+idx).classList.remove('active');
+  if(idx+1 < QUESTIONS.length){
+    current = idx+1;
+    document.getElementById('qcard'+(idx+1)).classList.add('active');
+    updateProgress();
+    window.scrollTo({top:0,behavior:'smooth'});
+  } else {
+    showSummary();
+  }
+}
+
+function updateProgress(){
+  const pct = ((current) / QUESTIONS.length)*100;
+  document.getElementById('prog').style.width = pct+'%';
+}
+
+function updateScore(){
+  document.getElementById('score-display').textContent = score;
+}
+
+function showSummary(){
+  document.getElementById('quiz-area').style.display='none';
+  document.getElementById('prog').style.width='100%';
+  const sum = document.getElementById('summary');
+  sum.style.display = 'block';
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('s-correct').textContent = correct;
+  document.getElementById('s-wrong').textContent = wrong;
+  const total = correct + wrong;
+  const pct = total > 0 ? Math.round(correct/total*100) : 0;
+  document.getElementById('s-pct').textContent = pct+'%';
+
+  const maxScore = QUESTIONS.reduce((a,q)=>a+pointsFor(q),0);
+  const msgs = [
+    [90,'🏆 ¡Excelente! Dominás los conceptos de campo eléctrico.'],
+    [70,'👏 Muy bien. Algunos conceptos para repasar, pero vas por buen camino.'],
+    [50,'📚 Bien. Revisá las explicaciones de las respuestas incorrectas.'],
+    [0,'💪 Seguí practicando. Releé el marco teórico y volvé a intentarlo.'],
+  ];
+  const p = score/maxScore*100;
+  document.getElementById('sum-msg').textContent = msgs.find(m=>p>=m[0])[1];
+}
+
+function restart(){
+  current=0; score=0; correct=0; wrong=0;
+  answered=new Array(QUESTIONS.length).fill(false);
+  document.getElementById('summary').style.display='none';
+  document.getElementById('quiz-area').style.display='block';
+  document.getElementById('score-display').textContent='0';
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ═══════════════════════════════════
+//  INIT
+// ═══════════════════════════════════
+render();
+</script>
+</body>
+</html>
